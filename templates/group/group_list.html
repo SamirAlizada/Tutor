@@ -1,0 +1,91 @@
+{% extends "index.html" %}
+
+{% block content %}
+<title>Group List</title>
+
+<style>
+    .group-list {
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .group-list h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .group-list ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .group-list li {
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .group-item {
+        display: flex;
+        align-items: center;
+        flex: 1;
+    }
+
+    .group-list li a {
+        flex: 1;
+        padding: 10px;
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        text-decoration: none;
+        color: #333;
+    }
+
+    .group-list li a:hover {
+        background-color: #e0e0e0;
+    }
+
+    .group-count {
+        margin-right: 10px;
+        font-weight: bold;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 5px;
+    }
+
+    .btn {
+        padding: 5px 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+    }
+</style>
+
+<div class="container group-list mt-5">
+    <h1>Qrup Siyahısı</h1>
+    <ul>
+        {% for group in groups %}
+            <li>
+                <div class="group-item">
+                    <span class="group-count">{{ forloop.counter }}</span>
+                    <a href="{% url 'group_detail' group.id %}">{{ group.name }}</a>
+                </div>
+                <div class="btn-group">
+                    <a href="{% url 'update_group' group.id %}" class="btn btn-update ml-1" style="background-color: #eeca5d;">Düzəliş Et</a>
+                    <a href="{% url 'delete_group' group.id %}" class="btn btn-delete" style="background-color: #DC3545; color: white;" onclick="return confirm('Bu qrupu silmək istədiyinizə əminsiniz?')">Sil</a>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+<br><br><br>
+{% endblock content %}

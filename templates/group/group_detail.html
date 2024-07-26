@@ -1,0 +1,141 @@
+{% extends "index.html" %}
+
+{% block content %}
+<title>Group Detail: {{ group.name }}</title>
+
+<style>
+    .group-detail {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .group-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .group-header h1 {
+        font-size: 24px;
+        margin: 0 auto;
+        text-align: center;
+        flex-grow: 1;
+    }
+
+    .back-button {
+        background-color: #424448;
+        color: white;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 10px;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .back-button:hover {
+        background-color: #000000;
+        text-decoration: none;
+        color: white;
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+    table, th, td {
+        border: 1px solid #ddd;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 5px;
+    }
+
+    .btn {
+        padding: 5px 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-update {
+        background-color: #ffc107;
+        color: black;
+    }
+
+    .btn-update:hover {
+        background-color: #e0a800;
+    }
+
+    .btn-delete {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .btn-delete:hover {
+        background-color: #c82333;
+    }
+</style>
+
+<div class="container group-detail mt-5">
+    <div class="group-header">
+        <a class="back-button" href="{% url 'group_list' %}">Geri</a>
+        <h1 class="text-right">Qrup: {{ group.name }}</h1>
+        <h1 class="text-right">Ümumi: {{ total_payments }} ₼</h1>
+    </div>
+    <table class="table text-center">
+        <thead>
+            <tr>
+                <th class="text-center">#</th>
+                <th class="text-center">Ad-Soyad</th>
+                <th class="text-center">Sinif</th>
+                <th class="text-center">Qiymət</th>
+                <th class="text-center">Başlanğıc Tarixi</th>
+                <th class="text-center">Bitiş Tarixi</th>
+                <th class="text-center">Əməliyyatlar</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+                <tr>
+                    <td class="text-center">{{ forloop.counter }}</td>
+                    <td class="text-center">{{ student.full_name }}</td>
+                    <td class="text-center">{{ student.grade }}</td>
+                    <td class="text-center">{{ student.price }} ₼</td>
+                    <td class="text-center">{{ student.add_date|date:"d/m/Y" }}</td>
+                    <td class="text-center">{{ student.end_date|date:"d/m/Y" }}</td>
+                    <td class="text-center">
+                        <a href="{% url 'update_student' student.id group.id %}" class="btn btn-update">Düzəliş Et</a>
+                        <a href="{% url 'delete_student' student.id %}" class="btn btn-delete" onclick="return confirm('Bu tələbəni silmək istədiyinizə əminsiniz?')">Sil</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}

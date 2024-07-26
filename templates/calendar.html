@@ -1,0 +1,102 @@
+{% extends "index.html" %}
+
+{% block content %}
+<style>
+    .current-day {
+        background-color: #bcbcc1; /* Light color for highlighting the current day */
+        border: 2px solid #007bff; /* Border color to make it stand out */
+    }
+
+    .calendar-table {
+        width: 100%;
+        table-layout: fixed; /* Ensures that all cells have the same width */
+        border-collapse: collapse; /* Ensures no double borders between cells */
+    }
+
+    .calendar-table thead th {
+        width: 14.285%; /* 100% / 7 days */
+        height: 60px;  /* Adjusted height for smaller header cells */
+        text-align: center; /* Horizontally center text */
+        vertical-align: middle; /* Vertically center text */
+        padding: 5px; /* Adjusted padding for smaller cells */
+        box-sizing: border-box; /* Includes padding and border in the width/height */
+        border: 1px solid #dee2e6; /* Adds border around header cells */
+        background-color: #f8f9fa; /* Optional: Adds background color to header */
+        font-size: 14px; /* Optional: Adjust font size if needed */
+    }
+
+    .calendar-day {
+        width: 14.285%; /* 100% / 7 days */
+        height: 100px;  /* Adjust height as needed */
+        vertical-align: top;
+        text-align: center;
+        padding: 10px;
+        box-sizing: border-box; /* Ensures padding and border are included in the width/height */
+        border: 1px solid #dee2e6; /* Optional: Adds border around cells */
+    }
+
+    .calendar-day ul {
+        margin: 0;
+        padding: 0;
+        list-style-type: none;
+    }
+
+    .calendar-day.text-muted {
+        color: #6c757d; /* Light color for days not in the current month */
+    }
+</style>
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Aylıq Təqvim - {{ selected_month }}/{{ selected_year }}</h1>
+
+    <form method="get" class="form-inline justify-content-center mb-4">
+        <div class="form-group mx-sm-3 mb-2">
+            <label for="month" class="mr-2"><strong>Ay:</strong></label>
+            <select id="month" name="month" class="form-control" onchange="this.form.submit()">
+                {% for month_num in months %}
+                    <option value="{{ month_num }}" {% if month_num == selected_month %}selected{% endif %}>
+                        {{ month_num }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group mx-sm-3 mb-2">
+            <label for="year" class="mr-2"><strong>İl:</strong></label>
+            <input type="number" id="year" name="year" class="form-control" value="{{ selected_year }}" style="width: 90px;" onchange="this.form.submit()">
+        </div>
+    </form>
+
+    <table class="table table-bordered calendar-table">
+        <thead class="thead-dark">
+            <tr>
+                <th>Bazar Ertəsi</th>
+                <th>Çərşənbə Axşamı</th>
+                <th>Çərşənbə</th>
+                <th>Cümə Axşamı</th>
+                <th>Cümə</th>
+                <th>Şənbə</th>
+                <th>Bazar</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for week in weeks %}
+                <tr>
+                    {% for day, groups in week %}
+                        <td class="calendar-day {% if day.month != selected_month %}text-muted{% endif %} {% if day == today %}current-day{% endif %}">
+                            <strong>{{ day|date:"j" }}</strong>
+                            <ul class="list-unstyled">
+                                {% for group in groups %}
+                                    <li>{{ group.group }}</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<br><br><br><br>
+{% endblock content %}

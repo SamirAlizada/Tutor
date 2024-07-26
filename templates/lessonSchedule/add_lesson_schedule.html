@@ -1,0 +1,179 @@
+{% include "index.html" %}
+
+{% block content %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-datepicker/1.12.1/i18n/datepicker-az.js"></script>
+
+<style>
+    form {
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
+
+    button[type="submit"] {
+        background-color: #4CAF50;
+        color: white;
+        padding: 12px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        width: 100%;
+    }
+
+    button[type="submit"]:hover {
+        background-color: #45a049;
+    }
+
+    label {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .group-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .group-header h1 {
+        font-size: 30px;
+        margin: 0 auto;
+        text-align: center;
+        flex-grow: 1;
+    }
+
+    .back-button {
+        background-color: #424448;
+        color: white;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 10px;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .back-button:hover {
+        background-color: #000000;
+        text-decoration: none;
+        color: white;
+    }
+
+    .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .form-group {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+</style>
+
+{% if messages %}
+<div class="alert alert-success" role="alert">
+    {% for message in messages %}
+    {{ message }}
+    {% endfor %}
+</div>
+{% endif %}
+
+<br>
+<form method="post" autocomplete="off">
+    <h2 class="text-center">Dərs Cədvəli Əlavə Et</h2>
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="group">Qrup:</label>
+        <select name="group" id="group">
+            {% for group in groups %}
+            <option value="{{ group.id }}">{{ group.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="start_date">Başlanğıc Tarix:</label>
+        <input type="text" id="start_date" name="start_date" required>
+    </div>
+    <div class="form-group">
+        <label for="end_date">Bitiş Tarix:</label>
+        <input type="text" id="end_date" name="end_date">
+    </div>
+    <div id="form_set">
+        {{ formset.management_form }}
+        {% for form in formset %}
+        <div class="form-row">
+            <div class="form-group">
+                <label for="id_product_name">Həftənin Günü:</label>
+                {{ form.day_of_week }}
+            </div>
+            <div class="form-group">
+                <label for="id_product_name">Saat:</label>
+                {{ form.time }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="text-right">
+        <button type="button" id="add-more" class="btn btn-primary">Daha çox</button>
+    </div>
+    <button type="submit">Əlavə Et</button>
+</form>
+
+<div id="empty_form" style="display: none;">
+    <div class="form-row">
+        <div class="form-group">
+            <label for="id_product_name">Həftənin Günü:</label>
+            {{ formset.empty_form.day_of_week }}
+        </div>
+        <div class="form-group">
+            <label for="id_product_name">Saat:</label>
+            {{ formset.empty_form.time }}
+        </div>
+    </div>
+</div>
+<br><br><br><br>
+
+<script>
+    $(document).ready(function () {
+        $.datepicker.setDefaults($.datepicker.regional['az']);
+        $("input[type='text'][name='start_date'], input[type='text'][name='end_date']").datepicker({
+            dateFormat: 'dd/mm/yy',
+            firstDay: 1, // Monday as the first day
+            dayNamesMin: ['B', 'B.e', 'Ç.a', 'Ç', 'C.a', 'C', 'Ş'],
+            monthNames: ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'İyun', 'İyul', 'Avqust', 'Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr']
+        });
+
+        $('#add-more').click(function () {
+            var form_idx = $('#id_form-TOTAL_FORMS').val();
+            $('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
+            $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+            $("input[type='text'][name='start_date'], input[type='text'][name='end_date']").datepicker({
+                dateFormat: 'dd/mm/yy',
+                firstDay: 1, // Monday as the first day
+                dayNamesMin: ['B', 'B.e', 'Ç.a', 'Ç', 'C.a', 'C', 'Ş'],
+                monthNames: ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'İyun', 'İyul', 'Avqust', 'Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr']
+            });
+        });
+    });
+</script>
+{% endblock content %}

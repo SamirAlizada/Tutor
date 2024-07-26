@@ -1,0 +1,125 @@
+{% extends "index.html" %}
+
+{% block content %}
+<title>Pay Day</title>
+
+<style>
+    .pay-day-container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .pay-day-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .pay-day-header h1 {
+        font-size: 24px;
+        margin: 0 auto;
+        text-align: center;
+        flex-grow: 1;
+    }
+
+    .back-button {
+        background-color: #424448;
+        color: white;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 10px;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .back-button:hover {
+        background-color: #000000;
+        text-decoration: none;
+        color: white;
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+    table, th, td {
+        border: 1px solid #ddd;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 5px;
+    }
+
+    .btn {
+        padding: 5px 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+    }
+</style>
+
+<div class="container pay-day-container mt-5">
+    <div class="pay-day-header">
+        <a class="back-button" href="{% url 'group_list' %}">Geri</a>
+        <h1>Ödəniş</h1>
+    </div>
+    <table class="table text-center">
+        <thead>
+            <tr>
+                <th class="text-center">#</th>
+                <th class="text-center">Ad-Soyad</th>
+                <th class="text-center">Qrup</th>
+                <th class="text-center">Sinif</th>
+                <th class="text-center">Qiymət</th>
+                <th class="text-center">Başlanğıc Tarixi</th>
+                <th class="text-center">Bitiş Tarixi</th>
+                <th class="text-center">Əməliyyatlar</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in expired_students %}
+                <tr>
+                    <td class="text-center">{{ forloop.counter }}</td>
+                    <td class="text-center">{{ student.full_name }}</td>
+                    <td class="text-center">{{ student.group }}</td>
+                    <td class="text-center">{{ student.grade }}</td>
+                    <td class="text-center">{{ student.price }} ₼</td>
+                    <td class="text-center">{{ student.add_date|date:"d/m/Y" }}</td>
+                    <td class="text-center">{{ student.end_date|date:"d/m/Y" }}</td>
+                    <td class="text-center">
+                        <a href="{% url 'renew_student' student.pk %}" class="btn btn-sm btn-success" onclick="return confirm('Bu tələbəni yeniləmək istədiyinizə əminsiniz?')">Yenilə</a>
+                        <a href="{% url 'update_student_pay' student.id %}" class="btn btn-sm btn-warning">Düzəliş Et</a>
+                        <a href="{% url 'delete_student' student.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Bu tələbəni silmək istədiyinizə əminsiniz?')">Sil</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}
