@@ -11,6 +11,8 @@ from calendar import monthrange, Calendar
 from django.forms import formset_factory
 from .forms import LessonScheduleForm
 import datetime
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 def add_group(request):
     if request.method == 'POST':
@@ -117,6 +119,59 @@ def group_detail(request, group_id):
     students = Student.objects.filter(group=group)
     total_payments = sum(student.price for student in students)
     return render(request, 'group/group_detail.html', {'group': group, 'students': students, 'total_payments': total_payments})
+
+def translate_month_name(date):
+    month_names = {
+        1: "Yanvar",
+        2: "Fevral",
+        3: "Mart",
+        4: "Aprel",
+        5: "May",
+        6: "İyun",
+        7: "İyul",
+        8: "Avqust",
+        9: "Sentyabr",
+        10: "Oktyabr",
+        11: "Noyabr",
+        12: "Dekabr",
+    }
+    month = month_names[date.month]
+    day = date.day
+    return f"{day} {month}"
+
+def day_detail(request, year, month, day):
+    date = datetime.date(year, month, day)
+    schedules = LessonSchedule.objects.filter(start_date=date, end_date=date).order_by('time')
+
+    if request.method == 'POST':
+        group_id = request.POST.get('group')
+        time = request.POST.get('time')
+
+        if group_id and time:
+            group = Group.objects.get(id=group_id)
+            new_lesson = LessonSchedule(
+                group=group,
+                start_date=date,
+                end_date=date,
+                time=time,
+                day_of_week=date.strftime('%A')  # Get the day of the week
+            )
+            new_lesson.save()
+            return HttpResponseRedirect(reverse('day_detail', args=[year, month, day]))
+    else:
+        # Initialize the form with empty data
+        form = LessonScheduleForm()
+
+    translated_date = translate_month_name(date)
+    groups = Group.objects.all()
+
+    context = {
+        'date': translated_date,
+        'schedules': schedules,
+        'groups': groups,
+        'form': LessonScheduleForm(),  # Pass an empty form to the template
+    }
+    return render(request, 'day_detail.html', context)
 
 def update_student(request, pk, group_id):
     student = get_object_or_404(Student, pk=pk)
