@@ -8,7 +8,7 @@ urlpatterns = [
     path('group/<int:group_id>/', group_detail, name='group_detail'),
     path('student/add/', add_student, name='add_student'),
 
-    #Update
+    # Update
     path('update-group/<int:pk>/', update_group, name='update_group'),
     path('lesson-schedule/update/', add_lesson_schedule, name='update_lesson_schedule'),
     path('student/update/<int:pk>/<int:group_id>/', update_student, name='update_student'),
@@ -20,6 +20,8 @@ urlpatterns = [
 
     path('pay-day/', pay_day, name='pay_day'),
     path('calendar/', calendar_view, name='calendar_view'),
+
+    path('day/<int:year>/<int:month>/<int:day>/', day_detail, name='day_detail'),
 
 
     path('renew-student/<int:student_id>/', renew_student, name='renew_student'),
