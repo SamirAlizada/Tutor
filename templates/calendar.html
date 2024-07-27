@@ -3,36 +3,36 @@
 {% block content %}
 <style>
     .current-day {
-        background-color: #bcbcc1; /* Light color for highlighting the current day */
-        border: 2px solid #007bff; /* Border color to make it stand out */
+        background-color: #bcbcc1;
+        border: 2px solid #007bff;
     }
 
     .calendar-table {
         width: 100%;
-        table-layout: fixed; /* Ensures that all cells have the same width */
-        border-collapse: collapse; /* Ensures no double borders between cells */
+        table-layout: fixed;
+        border-collapse: collapse;
     }
 
     .calendar-table thead th {
-        width: 14.285%; /* 100% / 7 days */
-        height: 60px;  /* Adjusted height for smaller header cells */
-        text-align: center; /* Horizontally center text */
-        vertical-align: middle; /* Vertically center text */
-        padding: 5px; /* Adjusted padding for smaller cells */
-        box-sizing: border-box; /* Includes padding and border in the width/height */
-        border: 1px solid #dee2e6; /* Adds border around header cells */
-        background-color: #f8f9fa; /* Optional: Adds background color to header */
-        font-size: 14px; /* Optional: Adjust font size if needed */
+        width: 14.285%;
+        height: 60px;
+        text-align: center;
+        vertical-align: middle;
+        padding: 5px;
+        box-sizing: border-box;
+        border: 1px solid #dee2e6;
+        background-color: #f8f9fa;
+        font-size: 14px;
     }
 
     .calendar-day {
-        width: 14.285%; /* 100% / 7 days */
-        height: 100px;  /* Adjust height as needed */
+        width: 14.285%;
+        height: 100px;
         vertical-align: top;
         text-align: center;
         padding: 10px;
-        box-sizing: border-box; /* Ensures padding and border are included in the width/height */
-        border: 1px solid #dee2e6; /* Optional: Adds border around cells */
+        box-sizing: border-box;
+        border: 1px solid #dee2e6;
     }
 
     .calendar-day ul {
@@ -42,7 +42,7 @@
     }
 
     .calendar-day.text-muted {
-        color: #6c757d; /* Light color for days not in the current month */
+        color: #6c757d;
     }
 </style>
 
@@ -84,7 +84,9 @@
                 <tr>
                     {% for day, groups in week %}
                         <td class="calendar-day {% if day.month != selected_month %}text-muted{% endif %} {% if day == today %}current-day{% endif %}">
-                            <strong>{{ day|date:"j" }}</strong>
+                            <a style="text-decoration: none; color: black;" href="{% url 'day_detail' day.year day.month day.day %}">
+                                <strong>{{ day|date:"j" }}</strong>
+                            </a>
                             <ul class="list-unstyled">
                                 {% for group in groups %}
                                     <li>{{ group.group }}</li>
@@ -97,6 +99,5 @@
         </tbody>
     </table>
 </div>
-
 <br><br><br><br>
 {% endblock content %}
