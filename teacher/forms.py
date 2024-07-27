@@ -52,18 +52,3 @@ class LessonScheduleForm(forms.ModelForm):
             'day_of_week': forms.Select(attrs={'class': 'form-control'}),
             'time': forms.TimeInput(format='%H:%M'),
         }
-        
-    # Customizing day_of_week field to allow multiple selections
-    # day_of_week = forms.MultipleChoiceField(
-    #     choices=DAYS_OF_WEEK,
-    #     widget=forms.CheckboxSelectMultiple,
-    #     required=False,
-    #     label='Həftənin Günləri'
-    # )
-    
-    # # Customizing time field to allow multiple time selections (if needed)
-    # time = forms.TimeField(
-    #     widget=forms.TimeInput(format='%H:%M'),
-    #     required=False,
-    #     label='Saat'
-    # )
