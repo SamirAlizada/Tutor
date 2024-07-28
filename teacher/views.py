@@ -170,6 +170,8 @@ def day_detail(request, year, month, day):
         'schedules': schedules,
         'groups': groups,
         'form': LessonScheduleForm(),  # Pass an empty form to the template
+        'selected_month': month,
+        'selected_year': year,
     }
     return render(request, 'day_detail.html', context)
 
