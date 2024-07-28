@@ -9,19 +9,23 @@
     }
 
     .card-header {
-        background-color: #4a4d52;
+        background-color: #3062ba;
         color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
     }
 
-    .btn-primary {
-        background-color: #007bff;
-        border-color: #007bff;
+    .btn-success {
+        background-color: #10851c;
+        border-color: #10851c;
         width: 100%;
     }
 
-    .btn-primary:hover {
-        background-color: #0056b3;
-        border-color: #0056b3;
+    .btn-success:hover {
+        background-color: #025923;
+        border-color: #025923;
     }
 
     .schedule-header {
@@ -33,20 +37,72 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        text-align: center;  /* Added for center alignment */
+        text-align: center;
     }
 
     .list-group-item span {
         flex: 1;
     }
+
+    #time input {
+        width: 466px !important;
+        height: 38px !important;
+    }
+
+    .back-button {
+        background-color: #424448;
+        color: white;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 10px;
+        text-decoration: none;
+        font-size: 14px;
+        margin-right: 10px;
+        position: absolute;
+        left: 0;
+    }
+
+    .back-button:hover {
+        background-color: #000000;
+        text-decoration: none;
+        color: white;
+    }
+
+    .title-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+    .title-container .back-button {
+        margin-bottom: 0;
+    }
+
+    .title-container h1 {
+        margin-left: 10px;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    .container {
+        text-align: center;
+    }
+
+    .card-header span {
+        margin: 0 auto;
+    }
 </style>
 
 <div class="container mt-5">
-    <h1 class="text-center mb-4">Qruplar - {{ date }}</h1>
+    <div class="title-container">
+        <h1>Qruplar - {{ date }}</h1>
+    </div>
 
     <div class="card mx-auto">
-        <div class="card-header text-center">
-            Planlaşdırılmış Dərslər
+        <div class="card-header">
+            <a class="back-button ml-1" style="background-color: #112d7b;" href="{% url 'calendar_view' %}?month={{ selected_month }}&year={{ selected_year }}">Geri</a>
+            <span>Planlaşdırılmış Dərslər</span>
         </div>
         <ul class="list-group list-group-flush">
             <li class="list-group-item schedule-header">
@@ -65,42 +121,44 @@
             {% endfor %}
         </ul>
         <div class="card-body text-center">
-            <button class="btn btn-primary btn-block" data-toggle="modal" data-target="#addLessonModal">Dərs Əlavə Et</button>
+            <button class="btn btn-success btn-block" data-toggle="modal" data-target="#addLessonModal">Dərs Əlavə Et</button>
         </div>
     </div>
     
     <!-- Modal for Adding Lesson -->
-<div class="modal fade" id="addLessonModal" tabindex="-1" role="dialog" aria-labelledby="addLessonModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addLessonModalLabel">Yeni Dərs Əlavə Et</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form method="post">
-                    {% csrf_token %}
-                    <input type="hidden" name="date" value="{{ date }}"> <!-- Pass the date to the form -->
-                    <div class="form-group">
-                        <label for="group">Qrup:</label>
-                        <select name="group" id="group" class="form-control">
-                            {% for group in groups %}
-                            <option value="{{ group.id }}">{{ group.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="time">Saat:</label>
-                        {{ form.time }}
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-block">Dərs Əlavə Et</button>
-                </form>
+    <div class="modal fade" id="addLessonModal" tabindex="-1" role="dialog" aria-labelledby="addLessonModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addLessonModalLabel">Yeni Dərs Əlavə Et</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="date" value="{{ date }}"> <!-- Pass the date to the form -->
+                        <div class="form-group">
+                            <label for="group">Qrup:</label>
+                            <select name="group" id="group" class="form-control">
+                                {% for group in groups %}
+                                <option value="{{ group.id }}">{{ group.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="time">Saat:</label>
+                            <div id="time">
+                                {{ form.time }}
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success btn-block">Dərs Əlavə Et</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-</div>
 {% endblock content %}
