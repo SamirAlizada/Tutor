@@ -26,6 +26,8 @@ def add_group(request):
 
 def add_lesson_schedule(request):
     LessonScheduleFormSet = formset_factory(LessonScheduleForm, extra=1)
+    
+    groups = Group.objects.all()  # Define the groups variable here
 
     if request.method == 'POST':
         formset = LessonScheduleFormSet(request.POST)
@@ -35,19 +37,19 @@ def add_lesson_schedule(request):
         end_date_str = request.POST.get('end_date')
 
         try:
-        # Parse start_date
+            # Parse start_date
             start_date = datetime.datetime.strptime(start_date_str, '%d/%m/%Y').date()
         except ValueError:
             messages.error(request, "Start date format is incorrect.")
             return redirect('add_lesson_schedule')
-        
+
         # Set end_date to start_date if not provided
         end_date = datetime.datetime.strptime(end_date_str, '%d/%m/%Y').date() if end_date_str else start_date
 
         if formset.is_valid():
             for form in formset:
                 day_of_week = form.cleaned_data.get('day_of_week')
-                time = form.cleaned_data.get('time')
+                time = form.cleaned_data.get('time', datetime.time(12, 0))  # Use 12:00 as default value
 
                 # Ensure time is provided
                 if not time:
@@ -76,21 +78,26 @@ def add_lesson_schedule(request):
                 current_date = start_date
                 while current_date <= end_date:
                     if current_date.weekday() == day_of_week_number:
-                        LessonSchedule.objects.create(
-                            group=group,
-                            start_date=current_date,
-                            end_date=current_date,
-                            time=time,
-                            day_of_week=day_of_week
-                        )
+                        try:
+                            LessonSchedule.objects.create(
+                                group=group,
+                                start_date=current_date,
+                                end_date=current_date,
+                                time=time,
+                                day_of_week=day_of_week
+                            )
+                        except Exception as e:
+                            print(f"Error creating LessonSchedule: {e}")
                     current_date += timedelta(days=1)
-            messages.success(request, f"Təqvimə uğurla əlavə edildi.")
-            return redirect('add_lesson_schedule')  # Add here the URL you want to redirect on success
+
+            messages.success(request, "Təqvimə uğurla əlavə edildi.")
+            return redirect('add_lesson_schedule')
         else:
+            for form in formset:
+                print(form.errors)  # Print form errors for debugging
             messages.error(request, "Formada səhvlər var. Zəhmət olmasa yoxlayın.")
     else:
         formset = LessonScheduleFormSet()
-        groups = Group.objects.all()
 
     return render(request, 'lessonSchedule/add_lesson_schedule.html', {'formset': formset, 'groups': groups})
 
