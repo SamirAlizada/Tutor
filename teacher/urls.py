@@ -26,6 +26,9 @@ urlpatterns = [
 
     path('renew-student/<int:student_id>/', renew_student, name='renew_student'),
 
+    path('update/<int:schedule_id>/<int:year>/<int:month>/<int:day>/', update_lesson_schedule, name='update_lesson_schedule'),
+    path('delete/<int:schedule_id>/<int:year>/<int:month>/<int:day>/', delete_lesson_schedule, name='delete_lesson_schedule'),
+
     # Account
     path('login/', user_login, name='login'),
     path('logout/', user_logout, name='logout'),
