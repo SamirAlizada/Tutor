@@ -44,6 +44,40 @@
         flex: 1;
     }
 
+    .operations {
+        display: flex;
+        justify-content: center;
+        gap: 2px; /* Adjust the space between buttons */
+    }
+
+    .operations a,
+    .operations form button {
+        margin: 0;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 4px;
+        color: white;
+        font-size: 14px;
+    }
+
+    .operations a {
+        background-color: #FFC107; /* Color for the "Düzəliş Et" button */
+        color: #000000;
+    }
+
+    .operations a:hover {
+        background-color: #b1731c; /* Hover color for the "Düzəliş Et" button */
+        color: #000000;
+    }
+
+    .operations form button {
+        background-color: #d9534f; /* Color for the "Sil" button */
+    }
+
+    .operations form button:hover {
+        background-color: #ad2a26; /* Hover color for the "Sil" button */
+    }
+
     #time input {
         width: 466px !important;
         height: 38px !important;
@@ -109,12 +143,20 @@
                 <span style="text-align: left;">#</span>
                 <span style="text-align: left;">Saat</span>
                 <span>Qrup</span>
+                <span>Əməliyyatlar</span>
             </li>
             {% for schedule in schedules %}
                 <li class="list-group-item">
                     <span style="text-align: left;">{{ forloop.counter }}</span>
                     <span style="text-align: left;">{{ schedule.time|date:"H:i" }}</span>
                     <span>{{ schedule.group.name }}</span>
+                    <span class="operations">
+                        <a href="{% url 'update_lesson_schedule' schedule.id selected_year selected_month selected_day %}" class="btn btn-primary btn-sm">Düzəliş Et</a>
+                        <form method="post" action="{% url 'delete_lesson_schedule' schedule.id selected_year selected_month selected_day %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm"  onclick="return confirm('Bu dərsi silmək istədiyinizə əminsiniz?')">Sil</button>
+                        </form>
+                    </span>
                 </li>
             {% empty %}
                 <li class="list-group-item">Bu günə heç bir dərs planlaşdırılmayıb.</li>
