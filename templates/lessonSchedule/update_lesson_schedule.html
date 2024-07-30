@@ -1,6 +1,11 @@
 {% include "index.html" %}
 
 {% block content %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-datepicker/1.12.1/i18n/datepicker-az.js"></script>
+
 <style>
     form {
         max-width: 400px;
@@ -12,8 +17,7 @@
     }
 
     input[type="text"],
-    input[type="date"],
-    input[type="number"],
+    input[type="time"],
     select {
         width: 100%;
         padding: 10px;
@@ -43,34 +47,8 @@
         margin-bottom: 5px;
     }
 
-    .group-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-
-    .group-header h1 {
-        font-size: 30px;
-        margin: 0 auto;
-        text-align: center;
-        flex-grow: 1;
-    }
-
-    .back-button {
-        background-color: #424448;
-        color: white;
-        padding: 5px 10px;
-        border: none;
-        border-radius: 10px;
-        text-decoration: none;
-        font-size: 14px;
-    }
-
-    .back-button:hover {
-        background-color: #000000;
-        text-decoration: none;
-        color: white;
+    .text-right {
+        text-align: right;
     }
 </style>
 
@@ -82,18 +60,59 @@
 </div>
 {% endif %}
 
-<br>
-<form method="post" class="mt-5">
-    <div class="group-header">
-        <a class="back-button" href="{% url 'group_list' %}">Geri</a>
-        <h1>Qrup-a Düzəliş Et</h1>
+{% if form.errors %}
+    <div class="alert alert-danger">
+        <ul>
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <li>{{ field.label }}: {{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
     </div>
+{% endif %}
+
+<br>
+<form method="post" autocomplete="off">
+    <h2 class="text-center">Dərs Cədvəlini Yenilə</h2>
     {% csrf_token %}
     <div class="form-group">
-        <label for="id_product_name">Qrup Adı:</label>
-        {{ form.name }}
+        <label for="group">Qrup:</label>
+        <select name="group" id="group" class="form-control">
+            {% for group in groups %}
+            <option value="{{ group.id }}" {% if group.id == lesson_schedule.group.id %}selected{% endif %}>{{ group.name }}</option>
+            {% endfor %}
+        </select>
     </div>
-    <button type="submit">Düzəliş Et</button>
+    <div class="form-group">
+        <label for="start_date">Tarix:</label>
+        <input type="text" id="start_date" name="start_date" value="{{ lesson_schedule.start_date|date:'d/m/Y' }}" required>
+    </div>
+    <div class="form-group">
+        <label for="day_of_week">Həftənin Günü:</label>
+        {{ form.day_of_week }}
+    </div>
+    <div class="form-group">
+        <label for="time">Saat:</label>
+        {{ form.time }}
+    </div>
+    <div class="text-right">
+        <button type="submit">Yenilə</button>
+    </div>
 </form>
-<br><br>
+<br><br><br>
+<script>
+    $(document).ready(function () {
+        $.datepicker.setDefaults($.datepicker.regional['az']);
+        $("input[type='text'][name='start_date'], input[type='text'][name='end_date']").datepicker({
+            dateFormat: 'dd/mm/yy',
+            firstDay: 1, // Monday as the first day
+            dayNamesMin: ['B', 'B.e', 'Ç.a', 'Ç', 'C.a', 'C', 'Ş'],
+            monthNames: ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'İyun', 'İyul', 'Avqust', 'Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr']
+        });
+    });
+</script>
 {% endblock content %}
