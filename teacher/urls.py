@@ -2,7 +2,8 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
-    path('', group_list, name='group_list'),
+    path('', daily_list, name='daily_list'),
+    path('group_list/', group_list, name='group_list'),
     path('group/add/', add_group, name='add_group'),
     path('lesson-schedule/add/', add_lesson_schedule, name='add_lesson_schedule'),
     path('group/<int:group_id>/', group_detail, name='group_detail'),
@@ -26,8 +27,10 @@ urlpatterns = [
 
     path('renew-student/<int:student_id>/', renew_student, name='renew_student'),
 
-    path('update/<int:schedule_id>/<int:year>/<int:month>/<int:day>/', update_lesson_schedule, name='update_lesson_schedule'),
-    path('delete/<int:schedule_id>/<int:year>/<int:month>/<int:day>/', delete_lesson_schedule, name='delete_lesson_schedule'),
+    path('update/<int:schedule_id>/', update_lesson_schedule, name='update_lesson_schedule'),
+    # path('delete/<int:schedule_id>/<int:year>/<int:month>/<int:day>/', delete_lesson_schedule, name='delete_lesson_schedule'),
+    path('delete/<int:schedule_id>/', delete_lesson_schedule, name='delete_lesson_schedule'),
+
 
     # Account
     path('login/', user_login, name='login'),
