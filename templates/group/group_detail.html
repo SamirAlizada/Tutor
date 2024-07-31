@@ -115,6 +115,7 @@
                 <th class="text-center">Ad-Soyad</th>
                 <th class="text-center">Sinif</th>
                 <th class="text-center">Qiymət</th>
+                <th class="text-center">Nömrə</th>
                 <th class="text-center">Başlanğıc Tarixi</th>
                 <th class="text-center">Bitiş Tarixi</th>
                 <th class="text-center">Əməliyyatlar</th>
@@ -125,8 +126,9 @@
                 <tr>
                     <td class="text-center">{{ forloop.counter }}</td>
                     <td class="text-center">{{ student.full_name }}</td>
-                    <td class="text-center">{{ student.grade }}</td>
+                    <td class="text-center" >{{ student.grade }}</td>
                     <td class="text-center">{{ student.price }} ₼</td>
+                    <td class="text-center">Ş-{{ student.student_mobile }} <br> V-{{ student.parent_mobile }}</td>
                     <td class="text-center">{{ student.add_date|date:"d/m/Y" }}</td>
                     <td class="text-center">{{ student.end_date|date:"d/m/Y" }}</td>
                     <td class="text-center">

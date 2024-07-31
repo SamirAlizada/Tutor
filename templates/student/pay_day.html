@@ -97,6 +97,7 @@
                 <th class="text-center">Qrup</th>
                 <th class="text-center">Sinif</th>
                 <th class="text-center">Qiymət</th>
+                <th class="text-center">Nömrə</th>
                 <th class="text-center">Başlanğıc Tarixi</th>
                 <th class="text-center">Bitiş Tarixi</th>
                 <th class="text-center">Əməliyyatlar</th>
@@ -110,6 +111,7 @@
                     <td class="text-center">{{ student.group }}</td>
                     <td class="text-center">{{ student.grade }}</td>
                     <td class="text-center">{{ student.price }} ₼</td>
+                    <td class="text-center">Ş-{{ student.student_mobile }} <br> V-{{ student.parent_mobile }}</td>
                     <td class="text-center">{{ student.add_date|date:"d/m/Y" }}</td>
                     <td class="text-center">{{ student.end_date|date:"d/m/Y" }}</td>
                     <td class="text-center">
