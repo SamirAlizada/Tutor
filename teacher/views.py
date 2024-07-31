@@ -1,5 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
+from django.urls import reverse
+from django.forms import formset_factory
+from calendar import Calendar, monthrange
 from .models import Group, Student, LessonSchedule
 from .forms import GroupForm, StudentForm, LessonScheduleForm
 from django.contrib import messages
@@ -7,15 +10,11 @@ from datetime import datetime, date, timedelta
 from django.utils import timezone
 from dateutil.relativedelta import relativedelta
 from django.db.models import Q
-from calendar import monthrange, Calendar
-from django.forms import formset_factory
 from .forms import LessonScheduleForm
 import datetime
 from django.http import HttpResponseRedirect
-from django.urls import reverse
 
-
-
+#Add
 def add_group(request):
     if request.method == 'POST':
         form = GroupForm(request.POST)
@@ -103,6 +102,23 @@ def add_lesson_schedule(request):
 
     return render(request, 'lessonSchedule/add_lesson_schedule.html', {'formset': formset, 'groups': groups})
 
+def add_student(request):
+    if request.method == 'POST':
+        print("POST request received")
+        form = StudentForm(request.POST)
+        if form.is_valid():
+            print("Form düzgündür")
+            form.save()
+            messages.success(request, 'Tələbə uğurla əlavə edildi.')
+            return redirect('add_student') 
+        else:
+            print("Form düzgün deyil")
+            print(form.errors)
+    else:
+        form = StudentForm()
+    return render(request, 'student/add_student.html', {'form': form})
+
+# Update
 def update_lesson_schedule(request, schedule_id):
     lesson_schedule = get_object_or_404(LessonSchedule, id=schedule_id)
     if request.method == 'POST':
@@ -141,77 +157,162 @@ def update_lesson_schedule(request, schedule_id):
         'groups': Group.objects.all()
     })
 
+def update_student(request, pk, group_id):
+    student = get_object_or_404(Student, pk=pk)
+    group = get_object_or_404(Group, pk=group_id)
+    if request.method == 'POST':
+        form = StudentForm(request.POST, instance=student)
+        if form.is_valid():
+            form.save()
+            return redirect('group_detail', group_id=group.id)
+    else:
+        form = StudentForm(instance=student)
+    return render(request, 'student/update_student.html', {'form': form, 'group': group})
 
+def update_student_pay(request, pk):
+    student = get_object_or_404(Student, pk=pk)
+    form = StudentForm(instance=student)
+    if request.method == 'POST':
+        form = StudentForm(request.POST, instance=student)
+        if form.is_valid():
+            form.save()
+            return redirect('pay_day')
+    return render(request, 'student/update_student_pay.html', {'form': form})
+
+def update_group(request, pk):
+    group = get_object_or_404(Group, pk=pk)
+    form = GroupForm(instance=group)
+    if request.method == 'POST':
+        form = GroupForm(request.POST, instance=group)
+        if form.is_valid():
+            form.save()
+            return redirect('group_list')
+    return render(request, 'group/update_group.html', {'form': form})
+
+def update_lesson_detail(request, schedule_id, year, month, day):
+    lesson_schedule = get_object_or_404(LessonSchedule, id=schedule_id)
+    if request.method == 'POST':
+        form = LessonScheduleForm(request.POST, instance=lesson_schedule)
+        group_id = request.POST.get('group')
+        group = Group.objects.get(id=group_id)
+        start_date_str = request.POST.get('start_date')
+        end_date_str = request.POST.get('end_date')
+
+        try:
+            # Parse start_date
+            start_date = datetime.datetime.strptime(start_date_str, '%d/%m/%Y').date()
+        except ValueError:
+            messages.error(request, "Start date format is incorrect.")
+            return redirect('update_lesson_schedule', id=schedule_id)
+
+        # Set end_date to start_date if not provided
+        end_date = datetime.datetime.strptime(end_date_str, '%d/%m/%Y').date() if end_date_str else start_date
+
+        if form.is_valid():
+            lesson_schedule.group = group
+            lesson_schedule.start_date = start_date
+            lesson_schedule.end_date = end_date
+            lesson_schedule.time = form.cleaned_data.get('time', datetime.time(12, 0))
+            lesson_schedule.day_of_week = form.cleaned_data.get('day_of_week')
+            lesson_schedule.save()
+            return HttpResponseRedirect(reverse('day_detail', args=[year, month, day]))
+        else:
+            messages.error(request, "Formada səhvlər var. Zəhmət olmasa yoxlayın.")
+    else:
+        form = LessonScheduleForm(instance=lesson_schedule)
+
+    return render(request, 'lessonSchedule/update_lesson_schedule.html', {
+        'form': form,
+        'lesson_schedule': lesson_schedule,
+        'groups': Group.objects.all()
+    })
+
+# Delete
 def delete_lesson_schedule(request, schedule_id):
     lesson_schedule = get_object_or_404(LessonSchedule, id=schedule_id)
     lesson_schedule.delete()
     return redirect('daily_list')
 
+def delete_lesson_detail(request, schedule_id, year, month, day):
+    schedule = get_object_or_404(LessonSchedule, id=schedule_id)
+    schedule.delete()
+    return HttpResponseRedirect(reverse('day_detail', args=[year, month, day]))
 
-from django.forms import modelform_factory
+def delete_group(request, pk):
+    group = Group.objects.get(pk=pk)
+    group.delete()
+    return redirect('group_list')
 
-# def update_lesson_schedule(request, schedule_id, year, month, day):
-#     schedule = get_object_or_404(LessonSchedule, id=schedule_id)
+def delete_student(request, pk):
+    student = get_object_or_404(Student, pk=pk)
+    group_id = student.group.id  # Get the id of the group the student belongs to
+    student.delete()
+    return redirect('group_detail', group_id=group_id)  # Redirect to group detail page
 
-#     if request.method == 'POST':
-#         form = UpdateLessonScheduleForm(request.POST, instance=schedule)
-#         if form.is_valid():
-#             form.save()
-#             messages.success(request, "Lesson schedule updated successfully.")
-#             return HttpResponseRedirect(reverse('day_detail', args=[year, month, day]))
-#         else:
-#             messages.error(request, "There were errors in the form. Please correct them and try again.")
-#     else:
-#         form = UpdateLessonScheduleForm(instance=schedule)
-
-#     return render(request, 'lessonSchedule/update_lesson_schedule.html', {'form': form, 'schedule': schedule})
-
-# def update_lesson_schedule(request, schedule_id):
-#     lesson = get_object_or_404(LessonSchedule, pk=schedule_id)
-
-#     if request.method == 'POST':
-#         form = UpdateLessonScheduleForm(request.POST, instance=lesson)
-#         if form.is_valid():
-#             form.save()
-#             messages.success(request, 'Lesson updated successfully.')
-#             return redirect('day_detail', year=lesson.start_date.year, month=lesson.start_date.month, day=lesson.start_date.day)
-#         else:
-#             messages.error(request, 'Please correct the errors below.')
-#     else:
-#         form = UpdateLessonScheduleForm(instance=lesson)
-
-#     groups = Group.objects.all()
-#     context = {
-#         'form': form,
-#         'lesson': lesson,
-#         'groups': groups,
-#     }
-#     return render(request, 'lessonSchedule/update_lesson_schedule.html', context)
-
-# def delete_lesson_schedule(request, schedule_id, year, month, day):
-#     schedule = get_object_or_404(LessonSchedule, id=schedule_id)
-#     schedule.delete()
-#     return HttpResponseRedirect(reverse('day_detail', args=[year, month, day]))
-
+# List
 def group_list(request):
     groups = Group.objects.all()
     return render(request, 'group/group_list.html', {'groups': groups})
 
-def add_student(request):
+def daily_list(request):
+    today = timezone.now().date()  # Get today's date
+
+    # Retrieve schedules for today
+    schedules = LessonSchedule.objects.filter(start_date=today).order_by('time')
+
+    # Haftanın günlerini İngilizce olarak tanımla
+    days_of_week_dict = {
+        'Monday': 'Bazar Ertəsi',
+        'Tuesday': 'Çərşənbə Axşamı',
+        'Wednesday': 'Çərşənbə',
+        'Thursday': 'Cümə Axşamı',
+        'Friday': 'Cümə',
+        'Saturday': 'Şənbə',
+        'Sunday': 'Bazar',
+    }
+
     if request.method == 'POST':
-        print("POST request received")
-        form = StudentForm(request.POST)
-        if form.is_valid():
-            print("Form düzgündür")
-            form.save()
-            messages.success(request, 'Tələbə uğurla əlavə edildi.')
-            return redirect('add_student') 
-        else:
-            print("Form düzgün deyil")
-            print(form.errors)
+        group_id = request.POST.get('group')
+        time_str = request.POST.get('time')
+
+        if group_id and time_str:
+            group = Group.objects.get(id=group_id)
+            
+            # Convert time_str to datetime.time object
+            try:
+                time = datetime.datetime.strptime(time_str, '%H:%M').time()
+            except ValueError:
+                print("Invalid time format:", time_str)
+                # Handle the error as appropriate, e.g., add an error message to the form
+
+            # Haftanın gününü İngilizce olarak al ve Azerbaijani seçeneğine dönüştür
+            day_of_week_english = today.strftime('%A')
+            day_of_week_azerbaijani = days_of_week_dict.get(day_of_week_english)
+
+            new_lesson = LessonSchedule(
+                group=group,
+                start_date=today,
+                end_date=today,
+                time=time,
+                day_of_week=day_of_week_azerbaijani  # Haftanın gününü ayarla
+            )
+            new_lesson.save()
+            return HttpResponseRedirect(reverse('daily_list'))
     else:
-        form = StudentForm()
-    return render(request, 'student/add_student.html', {'form': form})
+        # Initialize the form with empty data
+        form = LessonScheduleForm()
+        print("Form errors:", form.errors)
+
+    translated_date = translate_month_name(today)
+
+    context = {
+        'today': translated_date,
+        'schedules': schedules,
+        'groups': Group.objects.all(),
+        'form': LessonScheduleForm(),
+        'date': today,  # Pass today's date to the template
+    }
+    return render(request, 'daily_list.html', context)
 
 def group_detail(request, group_id):
     group = get_object_or_404(Group, id=group_id)
@@ -275,110 +376,6 @@ def day_detail(request, year, month, day):
     }
     return render(request, 'day_detail.html', context)
 
-def daily_list(request):
-    today = timezone.now().date()  # Get today's date
-
-    # Retrieve schedules for today
-    schedules = LessonSchedule.objects.filter(start_date=today).order_by('time')
-
-    # Haftanın günlerini İngilizce olarak tanımla
-    days_of_week_dict = {
-        'Monday': 'Bazar Ertəsi',
-        'Tuesday': 'Çərşənbə Axşamı',
-        'Wednesday': 'Çərşənbə',
-        'Thursday': 'Cümə Axşamı',
-        'Friday': 'Cümə',
-        'Saturday': 'Şənbə',
-        'Sunday': 'Bazar',
-    }
-
-    if request.method == 'POST':
-        group_id = request.POST.get('group')
-        time_str = request.POST.get('time')
-
-        if group_id and time_str:
-            group = Group.objects.get(id=group_id)
-            
-            # Convert time_str to datetime.time object
-            try:
-                time = datetime.datetime.strptime(time_str, '%H:%M').time()
-            except ValueError:
-                print("Invalid time format:", time_str)
-                # Handle the error as appropriate, e.g., add an error message to the form
-
-            # Haftanın gününü İngilizce olarak al ve Azerbaijani seçeneğine dönüştür
-            day_of_week_english = today.strftime('%A')
-            day_of_week_azerbaijani = days_of_week_dict.get(day_of_week_english)
-
-            new_lesson = LessonSchedule(
-                group=group,
-                start_date=today,
-                end_date=today,
-                time=time,
-                day_of_week=day_of_week_azerbaijani  # Haftanın gününü ayarla
-            )
-            new_lesson.save()
-            return HttpResponseRedirect(reverse('daily_list'))
-    else:
-        # Initialize the form with empty data
-        form = LessonScheduleForm()
-        print("Form errors:", form.errors)
-
-    translated_date = translate_month_name(today)
-
-    context = {
-        'today': translated_date,
-        'schedules': schedules,
-        'groups': Group.objects.all(),
-        'form': LessonScheduleForm(),
-        'date': today,  # Pass today's date to the template
-    }
-    return render(request, 'daily_list.html', context)
-
-def update_student(request, pk, group_id):
-    student = get_object_or_404(Student, pk=pk)
-    group = get_object_or_404(Group, pk=group_id)
-    if request.method == 'POST':
-        form = StudentForm(request.POST, instance=student)
-        if form.is_valid():
-            form.save()
-            return redirect('group_detail', group_id=group.id)
-    else:
-        form = StudentForm(instance=student)
-    return render(request, 'student/update_student.html', {'form': form, 'group': group})
-
-def update_student_pay(request, pk):
-    student = get_object_or_404(Student, pk=pk)
-    form = StudentForm(instance=student)
-    if request.method == 'POST':
-        form = StudentForm(request.POST, instance=student)
-        if form.is_valid():
-            form.save()
-            return redirect('pay_day')
-    return render(request, 'student/update_student_pay.html', {'form': form})
-
-def update_group(request, pk):
-    group = get_object_or_404(Group, pk=pk)
-    form = GroupForm(instance=group)
-    if request.method == 'POST':
-        form = GroupForm(request.POST, instance=group)
-        if form.is_valid():
-            form.save()
-            return redirect('group_list')
-    return render(request, 'group/update_group.html', {'form': form})
-
-# Delete
-def delete_group(request, pk):
-    group = Group.objects.get(pk=pk)
-    group.delete()
-    return redirect('group_list')
-
-def delete_student(request, pk):
-    student = get_object_or_404(Student, pk=pk)
-    group_id = student.group.id  # Get the id of the group the student belongs to
-    student.delete()
-    return redirect('group_detail', group_id=group_id)  # Redirect to group detail page
-
 def pay_day(request):
     now = datetime.datetime.now()
     today = now.date()
@@ -397,10 +394,6 @@ def renew_student(request, student_id):
     student.end_date = student.add_date + relativedelta(months=1)
     student.save()
     return redirect('pay_day')
-
-from django.utils import timezone
-from calendar import Calendar, monthrange
-import datetime
 
 def calendar_view(request):
     today = timezone.now().date()
