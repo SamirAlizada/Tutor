@@ -31,16 +31,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNavDropdown">
                 <ul class="navbar-nav">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" style="color: aliceblue;" href="#"
-                            id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true"
-                            aria-expanded="false">
-                            Siyahılar
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                            <a class="dropdown-item" href="{% url 'group_list' %}">Qrup</a>
-                        </div>
-                    </li>
+                    <a class="nav-link" style="color: white;" href="{% url 'group_list' %}">Qrup</a>
                     <a class="nav-link" style="color: white;" href="{% url 'daily_list' %}">Günlük</a>
                     <a class="nav-link" style="color: white;" href="{% url 'pay_day' %}">Ödəniş Günü</a>
                     <a class="nav-link" style="color: white;" href="{% url 'calendar_view' %}">Təqvim</a>
