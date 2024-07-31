@@ -4,7 +4,7 @@
 <style>
     .card {
         width: 100%;
-        max-width: 600px;
+        max-width: 800px;
         margin: 0 auto;
     }
 
@@ -126,6 +126,25 @@
     .card-header span {
         margin: 0 auto;
     }
+
+    /* Add these styles for text truncation */
+    .truncated {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 150px; /* Adjust as needed */
+    }
+
+    /* Ensure table layout is fixed */
+    .table-fixed {
+        table-layout: fixed;
+        width: 100%;
+    }
+
+    /* Left align the time */
+    .list-group-item .time {
+        text-align: left;
+    }
 </style>
 
 <div class="container mt-5">
@@ -138,30 +157,40 @@
             <a class="back-button ml-1" style="background-color: #112d7b;" href="{% url 'calendar_view' %}?month={{ selected_month }}&year={{ selected_year }}">Geri</a>
             <span>Planlaşdırılmış Dərslər</span>
         </div>
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item schedule-header">
-                <span style="text-align: left;">#</span>
-                <span style="text-align: left;">Saat</span>
-                <span>Qrup</span>
-                <span>Əməliyyatlar</span>
-            </li>
-            {% for schedule in schedules %}
-                <li class="list-group-item">
-                    <span style="text-align: left;">{{ forloop.counter }}</span>
-                    <span style="text-align: left;">{{ schedule.time|date:"H:i" }}</span>
-                    <span>{{ schedule.group.name }}</span>
-                    <span class="operations">
-                        <a href="{% url 'update_lesson_schedule' schedule.id selected_year selected_month selected_day %}" class="btn btn-primary btn-sm">Düzəliş Et</a>
-                        <form method="post" action="{% url 'delete_lesson_schedule' schedule.id selected_year selected_month selected_day %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-danger btn-sm"  onclick="return confirm('Bu dərsi silmək istədiyinizə əminsiniz?')">Sil</button>
-                        </form>
-                    </span>
-                </li>
-            {% empty %}
-                <li class="list-group-item">Bu günə heç bir dərs planlaşdırılmayıb.</li>
-            {% endfor %}
-        </ul>
+        <table class="table table-fixed">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Saat</th>
+                    <th>Qrup</th>
+                    <th>Əməliyyatlar</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for schedule in schedules %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ schedule.time|date:"H:i" }}</td>
+                        <td class="truncated" title="{{ schedule.group.name }}">
+                            {{ schedule.group.name|truncatechars:20 }}
+                        </td>
+                        <td>
+                            <div class="operations">
+                                <a href="{% url 'update_lesson_schedule' schedule.id %}" class="btn btn-update">Düzəliş Et</a>
+                                <form method="post" action="{% url 'delete_lesson_detail' schedule.id selected_year selected_month selected_day %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm"  onclick="return confirm('Bu dərsi silmək istədiyinizə əminsiniz?')">Sil</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4">Bu günə heç bir dərs planlaşdırılmayıb.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
         <div class="card-body text-center">
             <button class="btn btn-success btn-block" data-toggle="modal" data-target="#addLessonModal">Dərs Əlavə Et</button>
         </div>
