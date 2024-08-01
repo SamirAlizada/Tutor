@@ -108,6 +108,8 @@
             <a class="back-button" href="{% url 'group_list' %}">Geri</a>
         {% elif next_url == 'daily_list' %}
             <a class="back-button" href="{% url 'daily_list' %}">Geri</a>
+        {% elif next_url == 'pay_day' %}
+            <a class="back-button" href="{% url 'pay_day' %}">Geri</a>
         {% elif next_url == 'day_detail' %}
             <a class="back-button" href="{% url 'day_detail' selected_year selected_month selected_day %}">Geri</a>
         {% else %}
