@@ -119,11 +119,22 @@
         width: 449  px !important;
         height: 38px !important;
     }
+
+    .link-style {
+        text-decoration: none;
+        color: black;
+        font-weight: bold;
+    }
+
+    .link-style:hover {
+        text-decoration: none; /* or any other hover effect you prefer */
+        color: gray; /* or any other color you prefer */
+    }
 </style>
 
 <div class="container mt-5">
     <div class="title-container">
-        <h1>Qruplar - {{ today }}</h1>
+        <h1>Bugünün Dərsləri - {{ today }}</h1>
     </div>
 
     <div class="card mx-auto">
@@ -145,7 +156,9 @@
                         <td>{{ forloop.counter }}</td>
                         <td>{{ schedule.time|date:"H:i" }}</td>
                         <td class="truncated" title="{{ schedule.group.name }}">
-                            {{ schedule.group.name|truncatechars:20 }}
+                            <a href="{% url 'group_detail' schedule.group_id %}?next=daily_list" class="link-style">
+                                {{ schedule.group.name|truncatechars:20 }}
+                            </a>
                         </td>
                         <td>
                             <div class="operations">
