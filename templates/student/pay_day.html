@@ -113,9 +113,8 @@
                     <td class="text-center">{{ student.price }} ₼</td>
                     <td class="text-center">
                         {% if student.student_mobile != '0' %}
-                            Ş-{{ student.student_mobile }}
+                            Ş-{{ student.student_mobile }} <br>
                         {% endif %}
-                        <br>
                         {% if student.parent_mobile != '0' %}
                             V-{{ student.parent_mobile }}
                         {% endif %}
