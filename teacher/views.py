@@ -427,7 +427,7 @@ def calendar_view(request):
     last_day_of_month = datetime.date(year, month, last_day)
     
     # Get all groups for the selected month
-    groups = LessonSchedule.objects.filter(start_date__range=(first_day_of_month, last_day_of_month))
+    groups = LessonSchedule.objects.filter(start_date__range=(first_day_of_month, last_day_of_month)).order_by('time')
 
     # Prepare the days in the month, grouped by week
     cal = Calendar()
