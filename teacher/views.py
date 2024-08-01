@@ -163,7 +163,11 @@ def update_student(request, pk, group_id):
     if request.method == 'POST':
         form = StudentForm(request.POST, instance=student)
         if form.is_valid():
-            form.save()
+            student = form.save(commit=False)
+            # Update end_date if add_date changes
+            if student.add_date != student.__class__.objects.get(pk=pk).add_date:
+                student.end_date = student.add_date + relativedelta(months=1)
+            student.save()
             return redirect('group_detail', group_id=group.id)
     else:
         form = StudentForm(instance=student)
@@ -171,12 +175,17 @@ def update_student(request, pk, group_id):
 
 def update_student_pay(request, pk):
     student = get_object_or_404(Student, pk=pk)
-    form = StudentForm(instance=student)
     if request.method == 'POST':
         form = StudentForm(request.POST, instance=student)
         if form.is_valid():
-            form.save()
+            student = form.save(commit=False)
+            # Update end_date if add_date changes
+            if student.add_date != student.__class__.objects.get(pk=pk).add_date:
+                student.end_date = student.add_date + relativedelta(months=1)
+            student.save()
             return redirect('pay_day')
+    else:
+        form = StudentForm(instance=student)
     return render(request, 'student/update_student_pay.html', {'form': form})
 
 def update_group(request, pk):
