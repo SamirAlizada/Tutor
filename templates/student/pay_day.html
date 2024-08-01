@@ -82,6 +82,25 @@
         cursor: pointer;
         text-decoration: none;
     }
+
+    /* Add these styles for text truncation */
+    .truncated {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 150px; /* Adjust as needed */
+    }
+
+    .link-style {
+        text-decoration: none;
+        color: black;
+        font-weight: bold;
+    }
+
+    .link-style:hover {
+        text-decoration: none; /* or any other hover effect you prefer */
+        color: gray; /* or any other color you prefer */
+    }
 </style>
 
 <div class="container pay-day-container mt-5">
@@ -108,7 +127,11 @@
                 <tr>
                     <td class="text-center">{{ forloop.counter }}</td>
                     <td class="text-center">{{ student.full_name }}</td>
-                    <td class="text-center">{{ student.group }}</td>
+                    <td class="truncated" title="{{ student.group.name }}">
+                        <a href="{% url 'group_detail' student.group.id %}?next=pay_day" class="link-style">
+                            {{ student.group.name|truncatechars:20 }}
+                        </a>
+                    </td>
                     <td class="text-center">{{ student.grade }}</td>
                     <td class="text-center">{{ student.price }} ₼</td>
                     <td class="text-center">
