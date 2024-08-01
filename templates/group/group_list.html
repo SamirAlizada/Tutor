@@ -77,7 +77,7 @@
             <li>
                 <div class="group-item">
                     <span class="group-count">{{ forloop.counter }}</span>
-                    <a href="{% url 'group_detail' group.id %}">{{ group.name }}</a>
+                    <a href="{% url 'group_detail' group.id %}?next=group_list">{{ group.name }}</a>
                 </div>
                 <div class="btn-group">
                     <a href="{% url 'update_group' group.id %}" class="btn btn-update ml-1" style="background-color: #eeca5d;">Düzəliş Et</a>
