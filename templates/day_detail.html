@@ -145,6 +145,17 @@
     .list-group-item .time {
         text-align: left;
     }
+
+    .link-style {
+        text-decoration: none;
+        color: black;
+        font-weight: bold;
+    }
+
+    .link-style:hover {
+        text-decoration: none; /* or any other hover effect you prefer */
+        color: gray; /* or any other color you prefer */
+    }
 </style>
 
 <div class="container mt-5">
@@ -172,7 +183,9 @@
                         <td>{{ forloop.counter }}</td>
                         <td>{{ schedule.time|date:"H:i" }}</td>
                         <td class="truncated" title="{{ schedule.group.name }}">
-                            {{ schedule.group.name|truncatechars:20 }}
+                            <a href="{% url 'group_detail' schedule.group.id %}?next=day_detail&schedule_id={{ schedule.id }}&year={{ selected_year }}&month={{ selected_month }}&day={{ selected_day }}" class="link-style">
+                                {{ schedule.group.name|truncatechars:20 }}
+                            </a>
                         </td>
                         <td>
                             <div class="operations">
