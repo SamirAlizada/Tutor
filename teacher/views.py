@@ -318,7 +318,25 @@ def group_detail(request, group_id):
     group = get_object_or_404(Group, id=group_id)
     students = Student.objects.filter(group=group)
     total_payments = sum(student.price for student in students)
-    return render(request, 'group/group_detail.html', {'group': group, 'students': students, 'total_payments': total_payments})
+    
+    next_url = request.GET.get('next', '')
+    schedule_id = request.GET.get('schedule_id', '')
+    selected_year = request.GET.get('year', '')
+    selected_month = request.GET.get('month', '')
+    selected_day = request.GET.get('day', '')
+    
+    context = {
+        'group': group,
+        'students': students,
+        'total_payments': total_payments,
+        'next_url': next_url,
+        'schedule_id': schedule_id,
+        'selected_year': selected_year,
+        'selected_month': selected_month,
+        'selected_day': selected_day,
+    }
+    
+    return render(request, 'group/group_detail.html', context)
 
 def translate_month_name(date):
     month_names = {
