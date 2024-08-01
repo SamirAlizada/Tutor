@@ -104,7 +104,15 @@
 
 <div class="container group-detail mt-5">
     <div class="group-header">
-        <a class="back-button" href="{% url 'group_list' %}">Geri</a>
+        {% if next_url == 'group_list' %}
+            <a class="back-button" href="{% url 'group_list' %}">Geri</a>
+        {% elif next_url == 'daily_list' %}
+            <a class="back-button" href="{% url 'daily_list' %}">Geri</a>
+        {% elif next_url == 'day_detail' %}
+            <a class="back-button" href="{% url 'day_detail' selected_year selected_month selected_day %}">Geri</a>
+        {% else %}
+            <a class="back-button" href="#">Geri</a>
+        {% endif %}
         <h1 class="text-right">Qrup: {{ group.name }}</h1>
         <h1 class="text-right">Ümumi: {{ total_payments }} ₼</h1>
     </div>
@@ -128,7 +136,15 @@
                     <td class="text-center">{{ student.full_name }}</td>
                     <td class="text-center" >{{ student.grade }}</td>
                     <td class="text-center">{{ student.price }} ₼</td>
-                    <td class="text-center">Ş-{{ student.student_mobile }} <br> V-{{ student.parent_mobile }}</td>
+                    <td class="text-center">
+                        {% if student.student_mobile != '0' %}
+                            Ş-{{ student.student_mobile }}
+                        {% endif %}
+                        <br>
+                        {% if student.parent_mobile != '0' %}
+                            V-{{ student.parent_mobile }}
+                        {% endif %}
+                    </td>                    
                     <td class="text-center">{{ student.add_date|date:"d/m/Y" }}</td>
                     <td class="text-center">{{ student.end_date|date:"d/m/Y" }}</td>
                     <td class="text-center">
