@@ -27,6 +27,7 @@ urlpatterns = [
     # Delete
     path('delete-group/<int:pk>/', delete_group, name='delete_group'),
     path('delete-student/<int:pk>/', delete_student, name='delete_student'),
+    path('delete-student-pay/<int:pk>/', delete_student_pay, name='delete_student_pay'),
     path('delete/<int:schedule_id>/<int:year>/<int:month>/<int:day>/', delete_lesson_detail, name='delete_lesson_detail'),
     path('delete/<int:schedule_id>/', delete_lesson_schedule, name='delete_lesson_schedule'),
 
