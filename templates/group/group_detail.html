@@ -113,7 +113,7 @@
         {% elif next_url == 'day_detail' %}
             <a class="back-button" href="{% url 'day_detail' selected_year selected_month selected_day %}">Geri</a>
         {% else %}
-            <a class="back-button" href="#">Geri</a>
+            <a class="back-button" href="{% url 'group_list' %}">Geri</a>
         {% endif %}
         <h1 class="text-right">Qrup: {{ group.name }}</h1>
         <h1 class="text-right">Ümumi: {{ total_payments }} ₼</h1>
