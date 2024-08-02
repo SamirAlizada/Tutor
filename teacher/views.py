@@ -258,6 +258,11 @@ def delete_student(request, pk):
     student.delete()
     return redirect('group_detail', group_id=group_id)  # Redirect to group detail page
 
+def delete_student_pay(request, pk):
+    student = get_object_or_404(Student, pk=pk)
+    student.delete()
+    return redirect('pay_day')  # Redirect to pay_day
+
 # List
 def group_list(request):
     groups = Group.objects.all()
