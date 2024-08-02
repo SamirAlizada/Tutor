@@ -147,7 +147,7 @@
                     <td class="text-center">
                         <a href="{% url 'renew_student' student.pk %}" class="btn btn-sm btn-success" onclick="return confirm('Bu tələbəni yeniləmək istədiyinizə əminsiniz?')">Yenilə</a>
                         <a href="{% url 'update_student_pay' student.id %}" class="btn btn-sm btn-warning">Düzəliş Et</a>
-                        <a href="{% url 'delete_student' student.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Bu tələbəni silmək istədiyinizə əminsiniz?')">Sil</a>
+                        <a href="{% url 'delete_student_pay' student.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Bu tələbəni silmək istədiyinizə əminsiniz?')">Sil</a>
                     </td>
                 </tr>
             {% endfor %}
