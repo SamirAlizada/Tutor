@@ -33,8 +33,8 @@ class Student(models.Model):
     grade = models.IntegerField()
     add_date = models.DateField(default=timezone.now)
     end_date = models.DateField()
-    student_mobile = models.CharField(max_length=13, default='0')
-    parent_mobile = models.CharField(max_length=13, default='0')
+    student_mobile = models.CharField(max_length=15, null=True, blank=True)
+    parent_mobile = models.CharField(max_length=15, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.end_date:
