@@ -18,6 +18,8 @@ class CustomDateInput(forms.DateInput):
 
 class StudentForm(forms.ModelForm):
     add_date = forms.CharField(widget=CustomDateInput(attrs={'class': 'form-control', 'placeholder': 'DD/MM/YYYY'}))
+    student_mobile = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'maxlength': '17', 'placeholder': '(0XX) XXX XX XX'}))
+    parent_mobile = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'maxlength': '18', 'placeholder': '(0XX) XXX XX XX'}))
 
     class Meta:
         model = Student
