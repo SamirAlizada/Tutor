@@ -81,7 +81,7 @@
 <form method="post" autocomplete="off">
     <div class="group-header">
         <a class="back-button" href="{% url 'pay_day' %}">Geri</a>
-        <h1>Tələbə-ə Düzəliş Et</h1>
+        <h1>Tələbəyə Düzəliş Et</h1>
     </div>
     {% csrf_token %}
     <div class="form-group">
@@ -97,11 +97,11 @@
         {{ form.grade }}
     </div>
     <div class="form-group">
-        <label for="id_student_fee">Tələbənin Nömrəsi:</label>
+        <label for="id_student_mobile">Tələbənin Nömrəsi:</label>
         {{ form.student_mobile }}
     </div>
     <div class="form-group">
-        <label for="id_student_fee">Valideynin Nömrəsi:</label>
+        <label for="id_parent_mobile">Valideynin Nömrəsi:</label>
         {{ form.parent_mobile }}
     </div>
     <div class="form-group">
@@ -114,6 +114,41 @@
     </div>
     <button type="submit">Düzəliş Et</button>
 </form>
+<br><br>
+
+<script>
+    function maskPhoneNumber(input) {
+        input.addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, '');  // Remove all non-digit characters
+
+            // Ensure the value starts with '0' if it's not already there
+            if (!value.startsWith('0')) {
+                value = '0' + value;
+            }
+
+            // Apply the formatting
+            let x = value.match(/(\d{0,3})(\d{0,3})(\d{0,2})(\d{0,2})/);
+            e.target.value = (x[1] ? `(${x[1]})` : '') +
+                (x[2] ? ` ${x[2]}` : '') +
+                (x[3] ? ` ${x[3]}` : '') +
+                (x[4] ? ` ${x[4]}` : '');
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        let studentMobileInput = document.getElementById('id_student_mobile');
+        let parentMobileInput = document.getElementById('id_parent_mobile');
+
+        if (studentMobileInput) {
+            studentMobileInput.placeholder = "(0XX) XXX XX XX";
+            maskPhoneNumber(studentMobileInput);
+        }
+        if (parentMobileInput) {
+            parentMobileInput.placeholder = "(0XX) XXX XX XX";
+            maskPhoneNumber(parentMobileInput);
+        }
+    });
+</script>
 
 <br><br>
 {% endblock content %}
