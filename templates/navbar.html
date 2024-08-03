@@ -31,9 +31,9 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNavDropdown">
                 <ul class="navbar-nav">
-                    <a class="nav-link" style="color: white;" href="{% url 'group_list' %}">Qrup</a>
                     <a class="nav-link" style="color: white;" href="{% url 'daily_list' %}">Günlük</a>
                     <a class="nav-link" style="color: white;" href="{% url 'pay_day' %}">Ödəniş Günü</a>
+                    <a class="nav-link" style="color: white;" href="{% url 'group_list' %}">Qrup</a>
                     <a class="nav-link" style="color: white;" href="{% url 'calendar_view' %}">Təqvim</a>
                 </ul>
                 {% if user.is_authenticated %}
