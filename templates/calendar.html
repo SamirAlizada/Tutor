@@ -3,19 +3,43 @@
 {% block content %}
 <style>
     .current-day {
-        background-color: #bcbcc1;
-        border: 2px solid #007bff;
+        background-color: rgba(165, 162, 162, 0.2);
+        color: #070707;
+        border: 2px solid rgba(0, 123, 255, 0.7);
+        border-radius: 8px;
+    }
+
+    .sunday {
+        background-color: rgba(255, 58, 58, 0.2);
+        color: #FF3A3A;
+    }
+
+    .sunday-header {
+        background-color: #FF3A3A;
+        color: white;
+    }
+
+    .today-sunday {
+        background-color: rgba(255, 58, 58, 0.6);
+        color: white;
+        border: 2px solid #FF3A3A;
+        border-radius: 8px;
     }
 
     .calendar-container {
-        max-width: 1300px; /* Adjust the max-width as needed */
+        max-width: 1300px;
         margin: 0 auto;
-        padding: 0 15px; /* Optional padding for some space on the sides */
+        padding: 20px;
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 12px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
 
     .calendar-table {
         width: 100%;
-        border-collapse: collapse;
+        border-collapse: separate;
+        border-spacing: 10px;
+        font-size: 16px;
     }
 
     .calendar-table thead th {
@@ -23,26 +47,27 @@
         height: 60px;
         text-align: center;
         vertical-align: middle;
-        padding: 5px;
-        box-sizing: border-box;
-        border: 1px solid #dee2e6;
-        background-color: #f8f9fa;
-        font-size: 14px;
+        padding: 10px;
+        background-color: rgba(200, 200, 200, 0.8);
+        color: #333;
+        border-radius: 8px;
+        border: 1px solid rgba(180, 180, 180, 0.8);
     }
 
     .calendar-day {
-        height: 100px;
+        height: 120px;
         vertical-align: top;
         text-align: center;
         padding: 10px;
-        box-sizing: border-box;
-        border: 1px solid #dee2e6;
+        border: 1px solid rgba(200, 200, 200, 0.6);
+        border-radius: 8px;
         transition: background-color 0.3s, border-color 0.3s;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 
     .calendar-day:hover {
-        background-color: #e9ecef;
-        border-color: #000000;
+        background-color: rgba(220, 220, 220, 0.5);
+        border-color: rgba(0, 123, 255, 0.7);
     }
 
     .calendar-day a {
@@ -50,7 +75,7 @@
         width: 100%;
         height: 100%;
         text-decoration: none;
-        color: black;
+        color: inherit;
     }
 
     .calendar-day ul {
@@ -60,12 +85,12 @@
     }
 
     .calendar-day.text-muted {
-        color: #6c757d;
-        background-color: #f5f5f5;
+        color: #888;
+        background-color: rgba(185, 185, 185, 0.9);
     }
 
     .calendar-day.text-muted strong {
-        color: #6c757d;
+        color: #888;
     }
 
     .group-name {
@@ -75,6 +100,43 @@
         overflow: hidden;
         text-overflow: ellipsis;
         vertical-align: middle;
+        color: #007bff;
+    }
+
+    .badge-group {
+        background-color: rgba(0, 123, 255, 0.6);
+        color: #ffffff;
+        font-weight: bold;
+        padding: 5px;
+        border-radius: 5px;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .form-control, .form-control:focus {
+        background-color: rgba(239, 238, 238, 0.9);
+        color: #333;
+        border-radius: 8px;
+        border-color: rgba(200, 200, 200, 0.6);
+        box-shadow: none;
+    }
+
+    .form-inline label {
+        margin-right: 10px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .form-inline .form-control {
+        margin-top: 10px;
+    }
+
+    .form-control {
+        height: 40px;
+    }
+
+    .container h1 {
+        color: #007bff;
     }
 </style>
 
@@ -83,7 +145,7 @@
 
     <form method="get" class="form-inline justify-content-center mb-4">
         <div class="form-group mx-sm-3 mb-2">
-            <label for="month" class="mr-2"><strong>Ay:</strong></label>
+            <label for="month" class="mr-2">Ay:</label>
             <select id="month" name="month" class="form-control" onchange="this.form.submit()">
                 {% for month_num in months %}
                     <option value="{{ month_num }}" {% if month_num == selected_month %}selected{% endif %}>
@@ -94,13 +156,13 @@
         </div>
 
         <div class="form-group mx-sm-3 mb-2">
-            <label for="year" class="mr-2"><strong>İl:</strong></label>
+            <label for="year" class="mr-2">İl:</label>
             <input type="number" id="year" name="year" class="form-control" value="{{ selected_year }}" style="width: 90px;" onchange="this.form.submit()">
         </div>
     </form>
 
-    <table class="table table-bordered calendar-table">
-        <thead class="thead-dark">
+    <table class="table calendar-table">
+        <thead>
             <tr>
                 <th>Bazar Ertəsi</th>
                 <th>Çərşənbə Axşamı</th>
@@ -108,20 +170,20 @@
                 <th>Cümə Axşamı</th>
                 <th>Cümə</th>
                 <th>Şənbə</th>
-                <th>Bazar</th>
+                <th style="background-color: #f95c5c; color: white;">Bazar</th>
             </tr>
         </thead>
         <tbody>
             {% for week in weeks %}
                 <tr>
-                    {% for day, groups in week %}
-                        <td class="calendar-day {% if day.month != selected_month %}text-muted{% endif %} {% if day == today %}current-day{% endif %}">
+                    {% for day, groups, is_sunday in week %}
+                        <td class="calendar-day {% if day.month != selected_month %}text-muted{% endif %} {% if day == today %}current-day{% endif %} {% if is_sunday %}sunday{% if day == today %} today-sunday{% endif %}{% endif %}">
                             <a href="{% url 'day_detail' day.year day.month day.day %}">
                                 <strong>{{ day|date:"j" }}</strong>
                                 <ul class="list-unstyled">
                                     {% for group in groups %}
-                                        <li>
-                                            <span class="group-name" title="{{ group.group }}">
+                                        <li class="badge-group">
+                                            <span title="{{ group.group }}">
                                                 {{ group.group|truncatechars:20 }}
                                             </span>
                                         </li>
