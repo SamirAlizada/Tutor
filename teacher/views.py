@@ -451,9 +451,9 @@ def calendar_view(request):
         for day in week:
             if day.month == month:
                 day_groups = groups.filter(start_date=day)
-                week_days.append((day, day_groups))
+                week_days.append((day, day_groups, day.weekday() == 6))  # Sunday is represented by 6
             else:
-                week_days.append((day, []))
+                week_days.append((day, [], False))
         weeks.append(week_days)
     
     # Prepare the months for the dropdown
