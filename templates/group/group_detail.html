@@ -139,10 +139,10 @@
                     <td class="text-center" >{{ student.grade }}</td>
                     <td class="text-center">{{ student.price }} ₼</td>
                     <td class="text-center">
-                        {% if student.student_mobile != '0' %}
+                        {% if student.student_mobile != '(0)' %}
                             Ş-{{ student.student_mobile }} <br>
                         {% endif %}
-                        {% if student.parent_mobile != '0' %}
+                        {% if student.parent_mobile != '(0)' %}
                             V-{{ student.parent_mobile }}
                         {% endif %}
                     </td>                    
