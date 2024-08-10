@@ -162,7 +162,7 @@
                         </td>
                         <td>
                             <div class="operations">
-                                <a href="{% url 'update_lesson_schedule' schedule.id %}" class="btn btn-update">Düzəliş Et</a>
+                                <a href="{% url 'update_lesson_schedule' schedule.id %}?next=daily_list" class="btn btn-update">Düzəliş Et</a>
                                 <form method="post" action="{% url 'delete_lesson_schedule' schedule.id %}">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-danger" onclick="return confirm('Bu dərsi silmək istədiyinizə əminsiniz?')">Sil</button>
