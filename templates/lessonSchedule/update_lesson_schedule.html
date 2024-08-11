@@ -108,7 +108,11 @@
 <br>
 <form method="post" autocomplete="off" class="mt-5">
     <div class="group-header">
-        <a class="back-button" href="{% url 'daily_list' %}">Geri</a>
+        {% if next_url == 'daily_list' %}
+            <a class="back-button" href="{% url 'daily_list' %}">Geri</a>
+        {% else %}
+            <a class="back-button" href="{% url 'day_detail' selected_year selected_month selected_day %}">Geri</a>
+        {% endif %}
         <h2 class="text-center">Dərs Cədvəlini Yenilə</h2>
     </div>
     {% csrf_token %}
