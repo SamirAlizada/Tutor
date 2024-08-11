@@ -121,21 +121,30 @@ def add_student(request):
 # Update
 def update_lesson_schedule(request, schedule_id):
     lesson_schedule = get_object_or_404(LessonSchedule, id=schedule_id)
+    
     if request.method == 'POST':
         form = LessonScheduleForm(request.POST, instance=lesson_schedule)
         group_id = request.POST.get('group')
-        group = Group.objects.get(id=group_id)
+        group = get_object_or_404(Group, id=group_id)
+        
         start_date_str = request.POST.get('start_date')
         end_date_str = request.POST.get('end_date')
 
         try:
-            # Parse start_date
             start_date = datetime.datetime.strptime(start_date_str, '%d/%m/%Y').date()
         except ValueError:
             messages.error(request, "Start date format is incorrect.")
-            return redirect('update_lesson_schedule', id=schedule_id)
+            return render(request, 'lessonSchedule/update_lesson_schedule.html', {
+                'form': form,
+                'lesson_schedule': lesson_schedule,
+                'groups': Group.objects.all(),
+                'next_url': request.GET.get('next', ''),
+                'schedule_id' : request.GET.get('schedule_id', ''),
+                'selected_year': request.GET.get('year', ''),
+                'selected_month': request.GET.get('month', ''),
+                'selected_day': request.GET.get('day', ''),
+            })
 
-        # Set end_date to start_date if not provided
         end_date = datetime.datetime.strptime(end_date_str, '%d/%m/%Y').date() if end_date_str else start_date
 
         if form.is_valid():
@@ -147,14 +156,19 @@ def update_lesson_schedule(request, schedule_id):
             lesson_schedule.save()
             return redirect('daily_list')
         else:
-            messages.error(request, "Formada səhvlər var. Zəhmət olmasa yoxlayın.")
+            messages.error(request, "There are errors in the form. Please check.")
     else:
         form = LessonScheduleForm(instance=lesson_schedule)
 
     return render(request, 'lessonSchedule/update_lesson_schedule.html', {
         'form': form,
         'lesson_schedule': lesson_schedule,
-        'groups': Group.objects.all()
+        'groups': Group.objects.all(),
+        'next_url': request.GET.get('next', ''),
+        'schedule_id' : request.GET.get('schedule_id', ''),
+        'selected_year': request.GET.get('year', ''),
+        'selected_month': request.GET.get('month', ''),
+        'selected_day': request.GET.get('day', ''),
     })
 
 def update_student(request, pk, group_id):
@@ -233,7 +247,12 @@ def update_lesson_detail(request, schedule_id, year, month, day):
     return render(request, 'lessonSchedule/update_lesson_schedule.html', {
         'form': form,
         'lesson_schedule': lesson_schedule,
-        'groups': Group.objects.all()
+        'groups': Group.objects.all(),
+        'next_url': request.GET.get('next', ''),
+        'schedule_id' : request.GET.get('schedule_id', ''),
+        'selected_year': request.GET.get('year', ''),
+        'selected_month': request.GET.get('month', ''),
+        'selected_day': request.GET.get('day', ''),
     })
 
 # Delete
