@@ -207,7 +207,7 @@
                         </td>
                         <td>
                             <div class="operations">
-                                <a href="{% url 'update_lesson_detail' schedule.id selected_year selected_month selected_day %}" class="btn btn-update">Düzəliş Et</a>
+                                <a href="{% url 'update_lesson_detail' schedule.id selected_year selected_month selected_day %}?next=day_detail&schedule_id={{ schedule.id }}&year={{ selected_year }}&month={{ selected_month }}&day={{ selected_day }}" class="btn btn-update">Düzəliş Et</a>
                                 <form method="post" action="{% url 'delete_lesson_detail' schedule.id selected_year selected_month selected_day %}">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bu dərsi silmək istədiyinizə əminsiniz?')">Sil</button>
