@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="shortcut icon" href="https://www.princetonreview.com/cms-content/HowtoChooseanLSATTutor.jpg" type="image/x-icon">
+    <title>Teacher</title>
+</head>
+<body>
+    <style>
+        .card {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+    
+        .card-header {
+            background-color: #3062ba;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+    
+        .title-container {
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+    
+        .title-container h1 {
+            margin: 0;
+            font-weight: bold;
+        }
+    
+        /* Add these styles for text truncation */
+        .truncated {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px; /* Adjust as needed */
+        }
+        
+        /* Ensure table layout is fixed */
+        .table-fixed {
+            table-layout: fixed;
+            width: 100%;
+            font-weight: bold;
+        }
+    </style>
+    
+    <div class="container mt-5">
+        <div class="title-container">
+            <h1>Bugünün Dərsləri - {{ today }}</h1>
+        </div>
+        <div class="card mx-auto">
+            <div class="card-header">
+                <span>Planlaşdırılmış Dərslər</span>
+            </div>
+            <table class="table table-fixed">
+                <thead>
+                    <tr>
+                        <th style="width: 30%;">#</th>
+                        <th style="width: 25%;">Saat</th>
+                        <th style="width: 45%;">Qrup</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for schedule in schedules %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ schedule.time|date:"H:i" }}</td>
+                            <td class="truncated" title="{{ schedule.group.name }}">
+                                {% if schedule.group and schedule.group.id %}
+                                    {{ schedule.group.name }}
+                                {% else %}
+                                    <span>
+                                        {{ schedule.group.name|truncatechars:20 }}
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4">Bu günə heç bir dərs planlaşdırılmayıb.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+</body>
+</html>
