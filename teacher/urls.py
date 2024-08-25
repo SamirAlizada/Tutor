@@ -34,4 +34,9 @@ urlpatterns = [
     # Account
     path('login/', user_login, name='login'),
     path('logout/', user_logout, name='logout'),
+
+    path('pdf-daily/', generate_pdf_daily, name='pdf_daily'),
+    path('pdf-calendar/', generate_pdf_calendar, name='pdf_calendar'),
+
+
 ]
