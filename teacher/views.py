@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
 from django.forms import formset_factory
 from calendar import Calendar, monthrange
+from django.template.loader import render_to_string
 from .models import Group, Student, LessonSchedule
 from .forms import GroupForm, StudentForm, LessonScheduleForm
 from django.contrib import messages
@@ -12,7 +13,8 @@ from dateutil.relativedelta import relativedelta
 from django.db.models import Q
 from .forms import LessonScheduleForm
 import datetime
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
+import pdfkit
 
 #Add
 def add_group(request):
@@ -345,7 +347,7 @@ def daily_list(request):
         'form': LessonScheduleForm(),
         'date': today,  # Pass today's date to the template
     }
-    return render(request, 'daily_list.html', context)
+    return render(request, 'day/daily_list.html', context)
 
 def group_detail(request, group_id):
     group = get_object_or_404(Group, id=group_id)
@@ -425,7 +427,7 @@ def day_detail(request, year, month, day):
         'selected_month': month,
         'selected_year': year,
     }
-    return render(request, 'day_detail.html', context)
+    return render(request, 'day/day_detail.html', context)
 
 def pay_day(request):
     now = datetime.datetime.now()
@@ -487,7 +489,7 @@ def calendar_view(request):
         'months': months,
         'today': today,
     }
-    return render(request, 'calendar.html', context)
+    return render(request, 'calendar/calendar.html', context)
 
 # User
 def user_login(request):
@@ -505,3 +507,94 @@ def user_login(request):
 def user_logout(request):
     logout(request)
     return redirect('group_list')
+
+def generate_pdf_daily(request):
+    today = timezone.now().date()  # Get today's date
+    translated_date = translate_month_name(today)
+
+    # Retrieve dynamic data
+    schedules = LessonSchedule.objects.filter(start_date=today).order_by('time')
+
+    # Render the template to a string
+    html_content = render_to_string('day/daily_list_pdf.html', {
+        'today': translated_date,
+        'schedules': schedules,
+    })
+
+    # Specify the path to wkhtmltopdf
+    path_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+    config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
+
+    # Generate the PDF as a binary string
+    pdf_content = pdfkit.from_string(html_content, False, configuration=config)
+
+    # Create an HttpResponse object with the appropriate headers for file download
+    response = HttpResponse(pdf_content, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="gunluk_dersler.pdf"'
+
+    return response
+
+def generate_pdf_calendar(request):
+    today = timezone.now().date()
+    year = int(request.GET.get('year', today.year))
+    month = int(request.GET.get('month', today.month))
+
+    # Get the first and last day of the month
+    first_day_of_month = datetime.date(year, month, 1)
+    _, last_day = monthrange(year, month)
+    last_day_of_month = datetime.date(year, month, last_day)
+    
+    # Get all groups for the selected month
+    groups = LessonSchedule.objects.filter(start_date__range=(first_day_of_month, last_day_of_month)).order_by('time')
+
+    # Prepare the days in the month, grouped by week
+    cal = Calendar()
+    weeks = []
+    for week in cal.monthdatescalendar(year, month):
+        week_days = []
+        for day in week:
+            if day.month == month:
+                day_groups = groups.filter(start_date=day)
+                week_days.append((day, day_groups, day.weekday() == 6))  # Sunday is represented by 6
+            else:
+                week_days.append((day, [], False))
+        weeks.append(week_days)
+    
+    # Prepare the months for the dropdown
+    months = list(range(1, 13))
+
+    # Render the template to a string
+    html_content = render_to_string('calendar/calendar_pdf.html', {
+        'weeks': weeks,
+        'current_month': today.month,
+        'current_year': today.year,
+        'selected_month': month,
+        'selected_year': year,
+        'months': months,
+        'today': today,
+    })
+
+    # Specify the path to wkhtmltopdf
+    path_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+    config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
+
+    # Set PDF options for landscape orientation and fit-to-page settings
+    options = {
+        'orientation': 'Landscape',
+        'page-size': 'A4',
+        'margin-top': '0mm',
+        'margin-right': '0mm',
+        'margin-bottom': '0mm',
+        'margin-left': '0mm',
+        'dpi': 300,
+        'zoom': 0.83,  # Scale down content to fit everything on one page
+    }
+
+    # Generate the PDF as a binary string
+    pdf_content = pdfkit.from_string(html_content, False, configuration=config, options=options)
+
+    # Create an HttpResponse object with the appropriate headers for file download
+    response = HttpResponse(pdf_content, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="calendar_{year}_{month}.pdf"'
+
+    return response
