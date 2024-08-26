@@ -149,11 +149,11 @@
 
 <div class="form-container">
     {% if messages %}
-    <div class="alert alert-success" role="alert">
         {% for message in messages %}
-        {{ message }}
+            <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% endif %}" role="alert">
+                {{ message }}
+            </div>
         {% endfor %}
-    </div>
     {% endif %}
 
     <br>
@@ -163,7 +163,7 @@
         <div class="form-group">
             <label for="group">Qrup:</label>
             <select name="group" id="group">
-                <option value="" disabled selected>Qrup Seç</option>
+                <option value="" disabled selected>------------</option>
                 {% for group in groups %}
                 <option value="{{ group.id }}">{{ group.name }}</option>
                 {% endfor %}
