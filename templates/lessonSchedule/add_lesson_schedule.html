@@ -8,7 +8,7 @@
 
 <style>
     form {
-        max-width: 400px;
+        max-width: 600px;
         margin: 0 auto;
         padding: 20px;
         background: #f9f9f9;
@@ -79,87 +79,149 @@
 
     .form-row {
         display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
         align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 15px;
+        padding: 10px;
+        border: 1px solid #ADD8E6;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+        position: relative;
     }
 
     .form-group {
-        width: 100%;
-        margin-bottom: 10px;
+        flex: 1;
+    }
+
+    .time-input {
+        width: 120px;
+    }
+
+    .btn-remove {
+        background-color: #e74c3c;
+        color: white;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-left: 5px;
+        align-self: center; /* Ortalamayı sağlıyor */
+        margin-top: 10px;
+        /* margin-bottom: 5px; */
+    }
+
+    .btn-remove:hover {
+        background-color: #c0392b;
+    }
+
+    /* Footer ile çakışmayı önlemek için ekstra boşluk ekleme */
+    .form-container {
+        padding-bottom: 150px; /* Sayfanın altında ekstra boşluk oluştur */
+    }
+
+    /* Yeni form satırlarının sayfanın üstünden taşmaması için */
+    #form_set {
+        position: relative;
+        z-index: 1; /* Yeni form elemanlarının alt tarafta kalmasını sağla */
+    }
+
+    #id_form-0-time{
+        height: 38px !important;
+    }
+
+    #id_form-1-time{
+        height: 38px !important;
+    }
+
+    #id_form-2-time{
+        height: 38px !important;
+    }
+
+    #id_form-3-time{
+        height: 38px !important;
+    }
+
+    #id_form-4-time{
+        height: 38px !important;
     }
 </style>
 
-{% if messages %}
-<div class="alert alert-success" role="alert">
-    {% for message in messages %}
-    {{ message }}
-    {% endfor %}
-</div>
-{% endif %}
+<div class="form-container">
+    {% if messages %}
+    <div class="alert alert-success" role="alert">
+        {% for message in messages %}
+        {{ message }}
+        {% endfor %}
+    </div>
+    {% endif %}
 
-<br>
-<form method="post" autocomplete="off">
-    <h2 class="text-center">Dərs Cədvəli Əlavə Et</h2>
-    {% csrf_token %}
-    <div class="form-group">
-        <label for="group">Qrup:</label>
-        <select name="group" id="group">
-            <option value="" disabled selected>Qrup Seç</option>
-            {% for group in groups %}
-            <option value="{{ group.id }}">{{ group.name }}</option>
+    <br>
+    <form method="post" autocomplete="off">
+        <h2 class="text-center">Dərs Cədvəli Əlavə Et</h2>
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="group">Qrup:</label>
+            <select name="group" id="group">
+                <option value="" disabled selected>Qrup Seç</option>
+                {% for group in groups %}
+                <option value="{{ group.id }}">{{ group.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="start_date">Başlanğıc Tarix:</label>
+            <input type="text" id="start_date" name="start_date" required>
+        </div>
+        <div class="form-group">
+            <label for="end_date">Bitiş Tarix:</label>
+            <input type="text" id="end_date" name="end_date">
+        </div>
+        <div id="form_set">
+            {{ formset.management_form }}
+            {% for form in formset %}
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="id_product_name">Həftənin Günü:</label>
+                    {{ form.day_of_week }}
+                </div>
+                <div class="form-group">
+                    <label for="id_product_name">Saat:</label>
+                        {{ form.time }}
+                </div>
+                <!-- Sil Butonu Gizlidir -->
+                <button type="button" class="btn btn-danger btn-remove" style="display:none;">x</button>
+            </div>
             {% endfor %}
-        </select>
-    </div>
-    <div class="form-group">
-        <label for="start_date">Başlanğıc Tarix:</label>
-        <input type="text" id="start_date" name="start_date" required>
-    </div>
-    <div class="form-group">
-        <label for="end_date">Bitiş Tarix:</label>
-        <input type="text" id="end_date" name="end_date">
-    </div>
-    <div id="form_set">
-        {{ formset.management_form }}
-        {% for form in formset %}
+        </div>
+        <div class="text-right">
+            <button type="button" id="add-more" class="btn btn-primary">Əlavə Gün</button>
+        </div>
+        <button type="submit">Əlavə Et</button>
+    </form>
+
+    <div id="empty_form" style="display: none;">
         <div class="form-row">
             <div class="form-group">
                 <label for="id_product_name">Həftənin Günü:</label>
-                {{ form.day_of_week }}
+                {{ formset.empty_form.day_of_week }}
             </div>
             <div class="form-group">
-                <label for="id_product_name">Saat:</label>
-                {{ form.time }}
+                <label for="id_product_name" id="clock2">Saat:</label>
+                {{ formset.empty_form.time }}
             </div>
-        </div>
-        {% endfor %}
-    </div>
-    <div class="text-right">
-        <button type="button" id="add-more" class="btn btn-primary">Əlavə Gün</button>
-    </div>
-    <button type="submit">Əlavə Et</button>
-</form>
-
-<div id="empty_form" style="display: none;">
-    <div class="form-row">
-        <div class="form-group">
-            <label for="id_product_name">Həftənin Günü:</label>
-            {{ formset.empty_form.day_of_week }}
-        </div>
-        <div class="form-group">
-            <label for="id_product_name">Saat:</label>
-            {{ formset.empty_form.time }}
+            <!-- Yeni açılan formda Sil Butonu -->
+            <button type="button" class="btn btn-danger btn-remove">x</button>
         </div>
     </div>
 </div>
-<br><br><br><br>
 
 <script>
     $(document).ready(function () {
         $.datepicker.setDefaults($.datepicker.regional['az']);
         $("input[type='text'][name='start_date'], input[type='text'][name='end_date']").datepicker({
             dateFormat: 'dd/mm/yy',
-            firstDay: 1, // Monday as the first day
+            firstDay: 1,
             dayNamesMin: ['B', 'B.e', 'Ç.a', 'Ç', 'C.a', 'C', 'Ş'],
             monthNames: ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'İyun', 'İyul', 'Avqust', 'Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr']
         });
@@ -168,12 +230,21 @@
             var form_idx = $('#id_form-TOTAL_FORMS').val();
             $('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
             $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+
             $("input[type='text'][name='start_date'], input[type='text'][name='end_date']").datepicker({
                 dateFormat: 'dd/mm/yy',
-                firstDay: 1, // Monday as the first day
+                firstDay: 1,
                 dayNamesMin: ['B', 'B.e', 'Ç.a', 'Ç', 'C.a', 'C', 'Ş'],
                 monthNames: ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'İyun', 'İyul', 'Avqust', 'Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr']
             });
+
+            $('#form_set .form-row:last-child .btn-remove').show();
+        });
+
+        $('#form_set').on('click', '.btn-remove', function () {
+            $(this).closest('.form-row').remove();
+            var totalForms = $('#id_form-TOTAL_FORMS');
+            totalForms.val(parseInt(totalForms.val()) - 1);
         });
     });
 </script>
