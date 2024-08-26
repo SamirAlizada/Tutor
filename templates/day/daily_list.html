@@ -30,6 +30,19 @@
         border-color: #025923;
     }
 
+    .btn-primary {
+        background-color: #626363;
+        border-color: #626363;
+        justify-content: right;
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .btn-primary:hover {
+        background-color: #2a2b2a;
+        border-color: #2a2b2a;
+    }
+
     .list-group-item {
         display: flex;
         justify-content: space-between;
@@ -133,6 +146,13 @@
 </style>
 
 <div class="container mt-5">
+    <div class="row">
+        <div class="col-md-10"></div>
+        <div class="col-md-2">
+            <a href="{% url 'pdf_daily' %}"><button class="btn btn-primary">Çap Et</button></a>
+        </div>
+    </div>
+
     <div class="title-container">
         <h1>Bugünün Dərsləri - {{ today }}</h1>
     </div>
@@ -156,9 +176,15 @@
                         <td>{{ forloop.counter }}</td>
                         <td>{{ schedule.time|date:"H:i" }}</td>
                         <td class="truncated" title="{{ schedule.group.name }}">
-                            <a href="{% url 'group_detail' schedule.group_id %}?next=daily_list" class="link-style">
-                                {{ schedule.group.name|truncatechars:20 }}
-                            </a>
+                            {% if schedule.group and schedule.group.id %}
+                                <a href="{% url 'group_detail' schedule.group_id %}?next=daily_list" class="link-style">
+                                    {{ schedule.group.name|truncatechars:20 }}
+                                </a>
+                            {% else %}
+                                <span>
+                                    {{ schedule.group.name|truncatechars:20 }}
+                                </span>
+                            {% endif %}
                         </td>
                         <td>
                             <div class="operations">

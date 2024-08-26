@@ -138,9 +138,30 @@
     .container h1 {
         color: #007bff;
     }
+
+    .btn-primary {
+        background-color: #626363;
+        border-color: #626363;
+        justify-content: right;
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .btn-primary:hover {
+        background-color: #2a2b2a;
+        border-color: #2a2b2a;
+    }
 </style>
 
 <div class="container mt-5 calendar-container">
+    <div class="row">
+        <div class="col-md-10"></div>
+        <div class="col-md-2">
+            <a href="{% url 'pdf_calendar' %}?month={{ selected_month }}&year={{ selected_year }}">
+                <button class="btn btn-primary">Çap Et</button>
+            </a>
+        </div>
+    </div>
     <h1 class="text-center mb-4">Aylıq Təqvim - {{ selected_month }}/{{ selected_year }}</h1>
 
     <form method="get" class="form-inline justify-content-center mb-4">
