@@ -35,16 +35,33 @@ def add_lesson_schedule(request):
     if request.method == 'POST':
         formset = LessonScheduleFormSet(request.POST)
         group_id = request.POST.get('group')
-        group = Group.objects.get(id=group_id)
         start_date_str = request.POST.get('start_date')
         end_date_str = request.POST.get('end_date')
+
+        if not group_id:
+            messages.error(request, "Qrup seçilmədi. Zəhmət olmasa qrup seçin.")
+            return render(request, 'lessonSchedule/add_lesson_schedule.html', {
+                'formset': formset,
+                'groups': groups,
+                'start_date': start_date_str,
+                'end_date': end_date_str,
+                'group_id': group_id
+            })
+
+        group = Group.objects.get(id=group_id)
 
         try:
             # Parse start_date
             start_date = datetime.datetime.strptime(start_date_str, '%d/%m/%Y').date()
         except ValueError:
-            messages.error(request, "Start date format is incorrect.")
-            return redirect('add_lesson_schedule')
+            messages.error(request, "Başlama tarixinin formatı yanlışdır.")
+            return render(request, 'lessonSchedule/add_lesson_schedule.html', {
+                'formset': formset,
+                'groups': groups,
+                'start_date': start_date_str,
+                'end_date': end_date_str,
+                'group_id': group_id
+            })
 
         # Set end_date to start_date if not provided
         end_date = datetime.datetime.strptime(end_date_str, '%d/%m/%Y').date() if end_date_str else start_date
@@ -98,11 +115,18 @@ def add_lesson_schedule(request):
         else:
             for form in formset:
                 print(form.errors)  # Print form errors for debugging
-            messages.error(request, "Formada səhvlər var. Zəhmət olmasa yoxlayın.")
+            messages.error(request, "Formda səhvlər var. Zəhmət olmasa yoxlayın.")
     else:
         formset = LessonScheduleFormSet()
 
-    return render(request, 'lessonSchedule/add_lesson_schedule.html', {'formset': formset, 'groups': groups})
+    # If the request method is GET or there's an error, return the form with any previously entered data
+    return render(request, 'lessonSchedule/add_lesson_schedule.html', {
+        'formset': formset,
+        'groups': groups,
+        'start_date': request.POST.get('start_date', ''),
+        'end_date': request.POST.get('end_date', ''),
+        'group_id': request.POST.get('group', '')
+    })
 
 def add_student(request):
     if request.method == 'POST':
