@@ -3,9 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
-        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link rel="shortcut icon" href="https://www.princetonreview.com/cms-content/HowtoChooseanLSATTutor.jpg" type="image/x-icon">
     <title>Teacher</title>
 </head>
 <body>
@@ -14,14 +11,14 @@
             background-color: rgba(255, 58, 58, 0.2);
             color: #FF3A3A;
         }
-    
+
         .sunday-header {
             background-color: #FF3A3A;
             color: white;
         }   
     
         .calendar-container {
-            max-width: 1300px;
+            max-width: 1500px;  /* Increased width to better fit landscape */
             margin: 0 auto;
             padding: 20px;
             background-color: rgba(255, 255, 255, 0.9);
@@ -32,28 +29,27 @@
         .calendar-table {
             width: 100%;
             border-collapse: separate;
-            border-spacing: 10px;
-            font-size: 16px;
+            border-spacing: 5px;  /* Reduced spacing for better fit */
+            font-size: 14px;  /* Slightly reduced font size */
         }
     
         .calendar-table thead th {
             width: 14.285%;
-            height: 60px;
+            height: 50px;  /* Reduced height for headers */
             text-align: center;
             vertical-align: middle;
-            padding: 10px;
-            background-color: rgba(180, 180, 180, 0.9);  /* Updated background color */
+            padding: 5px;  /* Reduced padding */
+            background-color: rgba(180, 180, 180, 0.9);
             color: #333;
             border-radius: 8px;
-            border: 1px solid rgba(160, 160, 160, 0.8);  /* Updated border color */
+            border: 1px solid rgba(160, 160, 160, 0.8);
         }
     
         .calendar-day {
-            height: 120px;
+            height: 100px;  /* Reduced height for day cells */
             vertical-align: top;
             text-align: center;
-            padding: 10px;
-            /* border: 1px solid rgba(200, 200, 200, 0.6); */
+            padding: 5px;  /* Reduced padding */
             border-radius: 8px;
             transition: background-color 0.3s, border-color 0.3s;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
@@ -74,17 +70,17 @@
         }
     
         .calendar-day.text-muted {
-            color: #555;  /* Updated text color */
+            color: #555;
             background-color: rgba(185, 185, 185, 0.9);
         }
     
         .calendar-day.text-muted strong {
-            color: #555;  /* Updated text color */
+            color: #555;
         }
     
         .group-name {
             display: inline-block;
-            max-width: 140px;
+            max-width: 120px;  /* Reduced width to prevent overflow */
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -93,17 +89,19 @@
         }
     
         .badge-group {
-            background-color: rgba(0, 123, 255, 0.8);  /* Updated background color */
+            background-color: rgba(0, 123, 255, 0.8);
             color: #ffffff;
             font-weight: bold;
-            padding: 5px;
+            padding: 4px;  /* Reduced padding */
             border-radius: 5px;
-            font-size: 12px;
-            margin-top: 5px;
+            font-size: 11px;  /* Slightly reduced font size */
+            margin-top: 4px;
         }
     
         .container h1 {
             color: #007bff;
+            text-align: center;
+            font-size: 24px;  /* Reduced heading size */
         }
     </style>
     
@@ -119,7 +117,7 @@
                     <th>Cümə Axşamı</th>
                     <th>Cümə</th>
                     <th>Şənbə</th>
-                    <th style="background-color: #f95c5c; color: white;">Bazar</th>
+                    <th class="sunday-header">Bazar</th>
                 </tr>
             </thead>
             <tbody>
@@ -144,15 +142,5 @@
             </tbody>
         </table>
     </div>
-
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-            crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
-        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
-        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-        crossorigin="anonymous"></script>
 </body>
 </html>
