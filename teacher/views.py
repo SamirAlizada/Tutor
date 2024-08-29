@@ -546,7 +546,7 @@ def generate_pdf_daily(request):
     })
 
     # Specify the path to wkhtmltopdf
-    path_wkhtmltopdf = r'wkhtmltopdf.exe'
+    path_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
     config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
 
     # Generate the PDF as a binary string
@@ -599,7 +599,7 @@ def generate_pdf_calendar(request):
     })
 
     # Specify the path to wkhtmltopdf
-    path_wkhtmltopdf = r'wkhtmltopdf.exe'
+    path_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
     config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
 
     # Set PDF options for landscape orientation and fit-to-page settings
