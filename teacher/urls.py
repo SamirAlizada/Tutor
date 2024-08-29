@@ -4,7 +4,7 @@ from .views import *
 urlpatterns = [
     # List
     path('', daily_list, name='daily_list'),
-    path('group_list/', group_list, name='group_list'),
+    path('group-list/', group_list, name='group_list'),
     path('group/<int:group_id>/', group_detail, name='group_detail'),
     path('pay-day/', pay_day, name='pay_day'),
     path('calendar/', calendar_view, name='calendar_view'),
