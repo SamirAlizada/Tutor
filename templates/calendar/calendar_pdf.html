@@ -130,7 +130,7 @@
                                     {% for group in groups %}
                                         <li class="badge-group">
                                             <span title="{{ group.group }}">
-                                                {{ group.group|truncatechars:20 }}
+                                                {{ group.time|date:"H:i" }} - {{ group.group|truncatechars:20 }}
                                             </span>
                                         </li>
                                     {% endfor %}
