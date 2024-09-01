@@ -27,7 +27,7 @@
     }   
 
     .calendar-container {
-        max-width: 1300px;
+        max-width: 1350px;
         margin: 0 auto;
         padding: 20px;
         background-color: rgba(255, 255, 255, 0.9);
@@ -154,14 +154,14 @@
 </style>
 
 <div class="container mt-5 calendar-container">
-    <div class="row">
+    <!-- <div class="row">
         <div class="col-md-10"></div>
         <div class="col-md-2">
             <a href="{% url 'pdf_calendar' %}?month={{ selected_month }}&year={{ selected_year }}">
                 <button class="btn btn-primary">Çap Et</button>
             </a>
         </div>
-    </div>
+    </div> -->
     <h1 class="text-center mb-4">Aylıq Təqvim - {{ selected_month }}/{{ selected_year }}</h1>
 
     <form method="get" class="form-inline justify-content-center mb-4">
