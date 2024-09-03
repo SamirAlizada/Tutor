@@ -1,0 +1,209 @@
+{% extends "index.html" %}
+
+{% block content %}
+<style>
+    .week-header {
+        font-size: 35px;
+        margin-bottom: 30px;
+        text-align: center;
+        color: #0057c9;
+        font-weight: bold;
+    }
+
+    .calendar-container {
+        max-width: 1350px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 12px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .week-navigation {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+    .week-navigation a {
+        color: white;
+        background-color: #1960ab;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: background-color 0.3s;
+    }
+
+    .week-navigation a:hover {
+        background-color: #0056b3;
+    }
+
+    .calendar-table {
+        width: 100%;
+        table-layout: fixed;
+        border-collapse: separate;
+        border-spacing: 7px;
+        font-size: 16px;
+    }
+
+    .calendar-table thead th {
+        text-align: center;
+        vertical-align: middle;
+        padding: 10px;
+        background-color: rgba(180, 180, 180, 0.9);
+        color: #333;
+        border-radius: 8px;
+    }
+
+    .calendar-day {
+        height: 250px;
+        vertical-align: top;
+        text-align: left;
+        padding: 10px;
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: background-color 0.3s, border-color 0.3s;
+    }
+
+    .calendar-day:hover {
+        background-color: rgba(220, 220, 220, 0.5);
+        border-color: rgba(0, 123, 255, 0.7);
+    }
+
+    .calendar-day.today {
+        background-color: rgba(165, 162, 162, 0.4);
+        border: 4px solid rgba(11, 69, 202, 0.4);
+    }
+
+    .calendar-day ul {
+        padding: 0;
+        margin-top: 10px;
+        list-style-type: none;
+    }
+
+    .calendar-day ul li {
+        margin-bottom: 5px;
+        padding: 5px;
+        background-color: rgba(0, 123, 255, 0.8);
+        color: white;
+        border-radius: 5px;
+    }
+
+    .week-header, .calendar-day a {
+        text-decoration: none;
+    }
+
+    .text-muted {
+        color: #aaa;
+    }
+
+    .sunday {
+        background-color: rgba(255, 58, 58, 0.2);
+        color: #FF3A3A;
+    }
+
+    .sunday-header {
+        background-color: #FF3A3A;
+        color: white;
+    }
+
+    .today-sunday {  
+        background-color: rgba(255, 58, 58, 0.6);  /* Updated background color */
+        color: white;  
+        border: 4px solid rgba(218, 18, 18, 0.8);  /* Updated border color */
+        border-radius: 8px;  
+    }  
+
+    .badge-group {
+        background-color: rgba(0, 123, 255, 0.8);  /* Updated background color */
+        color: #ffffff;
+        font-weight: bold;
+        padding: 5px;
+        border-radius: 5px;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .calendar-day a {
+        display: block;
+        width: 100%;
+        height: 100%;
+        color: inherit;
+        text-decoration: none;
+        box-sizing: border-box;
+    }
+
+    .btn-primary {
+        background-color: #626363;
+        border-color: #626363;
+        justify-content: right;
+        width: 100%;
+        margin-top: 20px;
+        
+    }
+
+    .btn-primary:hover {
+        background-color: #2a2b2a;
+        border-color: #2a2b2a;
+    }
+</style>
+
+<div class="container calendar-container mt-5">
+    <div class="row">
+        <div class="col-md-10"></div>
+        <div class="col-md-2">
+            <a href="{% url 'pdf_weekly_schedule' %}?week_offset={{ week_offset }}">
+                <button class="btn btn-primary">Çap Et</button>
+            </a>
+        </div>
+    </div>
+    <div class="week-header">
+        Həftənin Dərsləri: {{ start_of_week }} - {{ end_of_week }}
+    </div>
+
+    <div class="week-navigation">
+        <a href="{% url 'weekly_schedule' week_offset=week_offset|add:'-1' %}"><Əvvəlki</a>
+        <a href="{% url 'weekly_schedule' week_offset=week_offset|add:'1' %}">Növbəti></a>
+    </div>
+
+    <table class="table calendar-table">
+        <thead>
+            <tr>
+                <th>Bazar Ertəsi</th>
+                <th>Çərşənbə Axşamı</th>
+                <th>Çərşənbə</th>
+                <th>Cümə Axşamı</th>
+                <th>Cümə</th>
+                <th>Şənbə</th>
+                <th style="background-color: #f95c5c; color: white;">Bazar</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                {% for day in days_of_week %}
+                    <td class="calendar-day 
+                            {% if day == today and day.weekday != 6 %}today{% endif %}
+                            {% if day.weekday == 6 %}sunday{% endif %}
+                            {% if day == today and day.weekday == 6 %}today-sunday{% endif %}">
+                            <a href="{% url 'week_day_detail' year=day.year month=day.month day=day.day week_offset=week_offset %}">
+                            <strong>{{ day|date:"j" }}</strong>
+                            <ul>
+                                {% for schedule in schedules %}
+                                    {% if schedule.start_date|date:"Y-m-d" == day|date:"Y-m-d" %}
+                                        <li class="badge-group text-center">
+                                            <span title="{{ schedule.group.name }}">
+                                                {{ schedule.group|truncatechars:20 }}
+                                            </span>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </a>
+                    </td>
+                {% endfor %}
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock content %}

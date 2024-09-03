@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pdf</title>
+</head>
+<body>
+    <style>
+        .week-header {
+            font-size: 35px;
+            margin-bottom: 30px;
+            text-align: center;
+            color: #0057c9;
+            font-weight: bold;
+        }
+    
+        .calendar-container {
+            max-width: 1350px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+    
+        .calendar-table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: separate;
+            border-spacing: 7px;
+            font-size: 16px;
+        }
+    
+        .calendar-table thead th {
+            text-align: center;
+            vertical-align: middle;
+            padding: 10px;
+            background-color: rgba(180, 180, 180, 0.9);
+            color: #333;
+            border-radius: 8px;
+        }
+    
+        .calendar-day {
+            height: 250px;
+            vertical-align: top;
+            text-align: left;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+    
+        .calendar-day ul {
+            padding: 0;
+            margin-top: 10px;
+            list-style-type: none;
+        }
+    
+        .calendar-day ul li {
+            margin-bottom: 5px;
+            padding: 5px;
+            background-color: rgba(0, 123, 255, 0.8);
+            color: white;
+            border-radius: 5px;
+        }
+    
+        .week-header, .calendar-day a {
+            text-decoration: none;
+        }
+    
+        .sunday {
+            background-color: rgba(255, 58, 58, 0.2);
+            color: #FF3A3A;
+        }
+    
+        .badge-group {
+            background-color: rgba(0, 123, 255, 0.8);  /* Updated background color */
+            color: #ffffff;
+            font-weight: bold;
+            padding: 5px;
+            border-radius: 5px;
+            font-size: 12px;
+            margin-top: 5px;
+            text-align: center;
+        }
+    </style>
+    
+    <div class="container calendar-container mt-5">
+        <div class="week-header">
+            Həftənin Dərsləri: {{ start_of_week }} - {{ end_of_week }}
+        </div>
+    
+        <table class="table calendar-table">
+            <thead>
+                <tr>
+                    <th>Bazar Ertəsi</th>
+                    <th>Çərşənbə Axşamı</th>
+                    <th>Çərşənbə</th>
+                    <th>Cümə Axşamı</th>
+                    <th>Cümə</th>
+                    <th>Şənbə</th>
+                    <th style="background-color: #f95c5c; color: white;">Bazar</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    {% for day in days_of_week %}
+                        <td class="calendar-day 
+                                {% if day.weekday == 6 %}sunday{% endif %}">
+                                <strong>{{ day|date:"j" }}</strong>
+                                <ul>
+                                    {% for schedule in schedules %}
+                                        {% if schedule.start_date|date:"Y-m-d" == day|date:"Y-m-d" %}
+                                            <li class="badge-group">
+                                                <span>
+                                                    {{ schedule.time|date:"H:i" }}- {{ schedule.group|truncatechars:20 }}
+                                                </span>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                        </td>
+                    {% endfor %}
+                </tr>
+            </tbody>
+        </table>
+    </div>    
+</body>
+</html>
