@@ -28,7 +28,7 @@ class LessonSchedule(models.Model):
 
 class Student(models.Model):
     group = models.ForeignKey('Group', on_delete=models.CASCADE)
-    full_name = models.CharField(max_length=200)
+    full_name = models.CharField(max_length=38)
     price = models.IntegerField()
     grade = models.IntegerField()
     add_date = models.DateField(default=timezone.now)
