@@ -13,7 +13,7 @@ from dateutil.relativedelta import relativedelta
 from django.db.models import Q
 from .forms import LessonScheduleForm
 import datetime
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseBadRequest, HttpResponseRedirect, HttpResponse
 import pdfkit
 
 #Add
@@ -145,6 +145,47 @@ def add_student(request):
     return render(request, 'student/add_student.html', {'form': form})
 
 # Update
+def update_student_pay(request, pk):
+    student = get_object_or_404(Student, pk=pk)
+    if request.method == 'POST':
+        form = StudentForm(request.POST, instance=student)
+        if form.is_valid():
+            student = form.save(commit=False)
+            # Update end_date if add_date changes
+            if student.add_date != student.__class__.objects.get(pk=pk).add_date:
+                student.end_date = student.add_date + relativedelta(months=1)
+            student.save()
+            return redirect('pay_day')
+    else:
+        form = StudentForm(instance=student)
+    return render(request, 'student/update_student_pay.html', {'form': form})
+
+def update_group(request, pk):
+    group = get_object_or_404(Group, pk=pk)
+    form = GroupForm(instance=group)
+    if request.method == 'POST':
+        form = GroupForm(request.POST, instance=group)
+        if form.is_valid():
+            form.save()
+            return redirect('group_list')
+    return render(request, 'group/update_group.html', {'form': form})
+
+def update_student(request, pk, group_id):
+    student = get_object_or_404(Student, pk=pk)
+    group = get_object_or_404(Group, pk=group_id)
+    if request.method == 'POST':
+        form = StudentForm(request.POST, instance=student)
+        if form.is_valid():
+            student = form.save(commit=False)
+            # Update end_date if add_date changes
+            if student.add_date != student.__class__.objects.get(pk=pk).add_date:
+                student.end_date = student.add_date + relativedelta(months=1)
+            student.save()
+            return redirect('group_detail', group_id=group.id)
+    else:
+        form = StudentForm(instance=student)
+    return render(request, 'student/update_student.html', {'form': form, 'group': group})
+
 def update_lesson_schedule(request, schedule_id):
     lesson_schedule = get_object_or_404(LessonSchedule, id=schedule_id)
     
@@ -169,6 +210,9 @@ def update_lesson_schedule(request, schedule_id):
                 'selected_year': request.GET.get('year', ''),
                 'selected_month': request.GET.get('month', ''),
                 'selected_day': request.GET.get('day', ''),
+                'year': request.GET.get('year', ''),
+                'month': request.GET.get('month', ''),
+                'day': request.GET.get('day', ''),
             })
 
         end_date = datetime.datetime.strptime(end_date_str, '%d/%m/%Y').date() if end_date_str else start_date
@@ -195,48 +239,10 @@ def update_lesson_schedule(request, schedule_id):
         'selected_year': request.GET.get('year', ''),
         'selected_month': request.GET.get('month', ''),
         'selected_day': request.GET.get('day', ''),
+        'year': request.GET.get('year', ''),
+        'month': request.GET.get('month', ''),
+        'day': request.GET.get('day', ''),
     })
-
-def update_student(request, pk, group_id):
-    student = get_object_or_404(Student, pk=pk)
-    group = get_object_or_404(Group, pk=group_id)
-    if request.method == 'POST':
-        form = StudentForm(request.POST, instance=student)
-        if form.is_valid():
-            student = form.save(commit=False)
-            # Update end_date if add_date changes
-            if student.add_date != student.__class__.objects.get(pk=pk).add_date:
-                student.end_date = student.add_date + relativedelta(months=1)
-            student.save()
-            return redirect('group_detail', group_id=group.id)
-    else:
-        form = StudentForm(instance=student)
-    return render(request, 'student/update_student.html', {'form': form, 'group': group})
-
-def update_student_pay(request, pk):
-    student = get_object_or_404(Student, pk=pk)
-    if request.method == 'POST':
-        form = StudentForm(request.POST, instance=student)
-        if form.is_valid():
-            student = form.save(commit=False)
-            # Update end_date if add_date changes
-            if student.add_date != student.__class__.objects.get(pk=pk).add_date:
-                student.end_date = student.add_date + relativedelta(months=1)
-            student.save()
-            return redirect('pay_day')
-    else:
-        form = StudentForm(instance=student)
-    return render(request, 'student/update_student_pay.html', {'form': form})
-
-def update_group(request, pk):
-    group = get_object_or_404(Group, pk=pk)
-    form = GroupForm(instance=group)
-    if request.method == 'POST':
-        form = GroupForm(request.POST, instance=group)
-        if form.is_valid():
-            form.save()
-            return redirect('group_list')
-    return render(request, 'group/update_group.html', {'form': form})
 
 def update_lesson_detail(request, schedule_id, year, month, day):
     lesson_schedule = get_object_or_404(LessonSchedule, id=schedule_id)
@@ -279,6 +285,48 @@ def update_lesson_detail(request, schedule_id, year, month, day):
         'selected_year': request.GET.get('year', ''),
         'selected_month': request.GET.get('month', ''),
         'selected_day': request.GET.get('day', ''),
+    })
+
+def update_weekly_lesson_detail(request, schedule_id, year, month, day, week_offset):
+    lesson_schedule = get_object_or_404(LessonSchedule, id=schedule_id)
+    if request.method == 'POST':
+        form = LessonScheduleForm(request.POST, instance=lesson_schedule)
+        group_id = request.POST.get('group')
+        group = get_object_or_404(Group, id=group_id)
+        start_date_str = request.POST.get('start_date')
+        end_date_str = request.POST.get('end_date')
+
+        try:
+            start_date = datetime.datetime.strptime(start_date_str, '%d/%m/%Y').date()
+        except ValueError:
+            messages.error(request, "Start date format is incorrect.")
+            return redirect('update_weekly_lesson_detail', schedule_id=schedule_id, year=year, month=month, day=day, week_offset=week_offset)
+
+        end_date = datetime.datetime.strptime(end_date_str, '%d/%m/%Y').date() if end_date_str else start_date
+
+        if form.is_valid():
+            lesson_schedule.group = group
+            lesson_schedule.start_date = start_date
+            lesson_schedule.end_date = end_date
+            lesson_schedule.time = form.cleaned_data.get('time', datetime.time(12, 0))
+            lesson_schedule.day_of_week = form.cleaned_data.get('day_of_week')
+            lesson_schedule.save()
+            return HttpResponseRedirect(reverse('week_day_detail', args=[year, month, day, week_offset]))
+        else:
+            messages.error(request, "There are errors in the form. Please check.")
+    else:
+        form = LessonScheduleForm(instance=lesson_schedule)
+
+    return render(request, 'lessonSchedule/update_lesson_schedule.html', {
+        'form': form,
+        'lesson_schedule': lesson_schedule,
+        'groups': Group.objects.all(),
+        'next_url': request.GET.get('next', ''),
+        'schedule_id': schedule_id,
+        'year': year,
+        'month': month,
+        'day': day,
+        'week_offset': week_offset,
     })
 
 # Delete
@@ -360,7 +408,6 @@ def daily_list(request):
     else:
         # Initialize the form with empty data
         form = LessonScheduleForm()
-        print("Form errors:", form.errors)
 
     translated_date = translate_month_name(today)
 
@@ -383,6 +430,7 @@ def group_detail(request, group_id):
     selected_year = request.GET.get('year', '')
     selected_month = request.GET.get('month', '')
     selected_day = request.GET.get('day', '')
+    week_offset = request.GET.get('week_offset', '')
     
     context = {
         'group': group,
@@ -393,6 +441,7 @@ def group_detail(request, group_id):
         'selected_year': selected_year,
         'selected_month': selected_month,
         'selected_day': selected_day,
+        'week_offset': week_offset,
     }
     
     return render(request, 'group/group_detail.html', context)
@@ -420,18 +469,39 @@ def day_detail(request, year, month, day):
     date = datetime.date(year, month, day)
     schedules = LessonSchedule.objects.filter(start_date=date, end_date=date).order_by('time')
 
+    # Haftanın günlerini İngilizce olarak tanımla
+    days_of_week_dict = {
+        'Monday': 'Bazar Ertəsi',
+        'Tuesday': 'Çərşənbə Axşamı',
+        'Wednesday': 'Çərşənbə',
+        'Thursday': 'Cümə Axşamı',
+        'Friday': 'Cümə',
+        'Saturday': 'Şənbə',
+        'Sunday': 'Bazar',
+    }
     if request.method == 'POST':
         group_id = request.POST.get('group')
-        time = request.POST.get('time')
+        time_str = request.POST.get('time')
 
-        if group_id and time:
+        if group_id and time_str:
             group = Group.objects.get(id=group_id)
+            # Convert time_str to datetime.time object
+            try:
+                time = datetime.datetime.strptime(time_str, '%H:%M').time()
+            except ValueError:
+                print("Invalid time format:", time_str)
+                # Handle the error as appropriate, e.g., add an error message to the form
+
+            # Haftanın gününü İngilizce olarak al ve Azerbaijani seçeneğine dönüştür
+            day_of_week_english = date.strftime('%A')
+            day_of_week_azerbaijani = days_of_week_dict.get(day_of_week_english)
+
             new_lesson = LessonSchedule(
                 group=group,
                 start_date=date,
                 end_date=date,
                 time=time,
-                day_of_week=date.strftime('%A')  # Get the day of the week
+                day_of_week=day_of_week_azerbaijani  # Haftanın gününü ayarla
             )
             new_lesson.save()
             return HttpResponseRedirect(reverse('day_detail', args=[year, month, day]))
@@ -452,6 +522,115 @@ def day_detail(request, year, month, day):
         'selected_year': year,
     }
     return render(request, 'day/day_detail.html', context)
+
+def week_day_detail(request, year, month, day, week_offset):
+    try:
+        # String olarak gelen year, month, day ve week_offset parametrelerini integer'a çeviriyoruz
+        year = int(year)
+        month = int(month)
+        day = int(day)
+        week_offset = int(week_offset)
+    except ValueError:
+        return HttpResponseBadRequest("Invalid week_offset value")
+
+    # Belirtilen günün tarihini al
+    date = datetime.date(year, month, day)
+
+    # Bu günün ders programlarını al
+    schedules = LessonSchedule.objects.filter(start_date=date, end_date=date).order_by('time')
+
+    # Aynı haftaya geri dönüş için haftanın başlangıç ve bitiş tarihlerini hesapla
+    start_of_week = date - datetime.timedelta(days=date.weekday())
+    end_of_week = start_of_week + datetime.timedelta(days=6)
+    
+    start_of_week_str = f"{start_of_week.day} {get_month_name(start_of_week.month)}"
+    end_of_week_str = f"{end_of_week.day} {get_month_name(end_of_week.month)}"
+
+    # Haftanın günlerini İngilizce olarak tanımla
+    days_of_week_dict = {
+        'Monday': 'Bazar Ertəsi',
+        'Tuesday': 'Çərşənbə Axşamı',
+        'Wednesday': 'Çərşənbə',
+        'Thursday': 'Cümə Axşamı',
+        'Friday': 'Cümə',
+        'Saturday': 'Şənbə',
+        'Sunday': 'Bazar',
+    }
+    if request.method == 'POST':
+        group_id = request.POST.get('group')
+        time_str = request.POST.get('time')
+        if group_id and time_str:
+            group = Group.objects.get(id=group_id)
+            # Convert time_str to datetime.time object
+            try:
+                time = datetime.datetime.strptime(time_str, '%H:%M').time()
+            except ValueError:
+                print("Invalid time format:", time_str)
+                # Handle the error as appropriate, e.g., add an error message to the form
+
+            # Haftanın gününü İngilizce olarak al ve Azerbaijani seçeneğine dönüştür
+            day_of_week_english = date.strftime('%A')
+            day_of_week_azerbaijani = days_of_week_dict.get(day_of_week_english)
+                
+            new_lesson = LessonSchedule(
+                group=group,
+                start_date=date,
+                end_date=date,
+                time=time,
+                day_of_week=day_of_week_azerbaijani  # Haftanın gününü ayarla
+            )
+            new_lesson.save()
+            return HttpResponseRedirect(reverse('week_day_detail', args=[year, month, day, week_offset]))
+    else:
+        # Initialize the form with empty data
+        form = LessonScheduleForm()
+
+    translated_date = translate_month_name(date)
+    groups = Group.objects.all()
+
+    context = {
+        'schedules': schedules,
+        'date': translated_date,
+        'groups': groups,
+        'form': LessonScheduleForm(),  # Pass an empty form to the template
+        'start_of_week': start_of_week_str,
+        'end_of_week': end_of_week_str,
+        'week_offset': week_offset,
+        'day': day,
+        'month': month,
+        'year': year,
+    }
+    return render(request, 'weekly/week_day_detail.html', context)
+
+def get_month_name(month_number):
+    months = [
+        'Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'İyun',
+        'İyul', 'Avqust', 'Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr'
+    ]
+    return months[month_number - 1]
+
+def weekly_schedule_view(request, week_offset=0):
+    today = timezone.now().date()
+    start_of_week = today - timedelta(days=today.weekday()) + timedelta(weeks=int(week_offset))
+    end_of_week = start_of_week + timedelta(days=6)
+
+    days_of_week = [start_of_week + timedelta(days=i) for i in range(7)]
+
+    schedules = LessonSchedule.objects.filter(start_date__lte=end_of_week, end_date__gte=start_of_week).order_by('time')
+
+    # Format dates for Azerbaycan language
+    start_of_week_str = f"{start_of_week.day} {get_month_name(start_of_week.month)}"
+    end_of_week_str = f"{end_of_week.day} {get_month_name(end_of_week.month)}"
+
+    context = {
+        'schedules': schedules,
+        'start_of_week': start_of_week_str,
+        'end_of_week': end_of_week_str,
+        'week_offset': int(week_offset),
+        'days_of_week': days_of_week,
+        'today': today
+    }
+    return render(request, 'weekly/weekly_schedule.html', context)
 
 def pay_day(request):
     now = datetime.datetime.now()
@@ -555,6 +734,53 @@ def generate_pdf_daily(request):
     # Create an HttpResponse object with the appropriate headers for file download
     response = HttpResponse(pdf_content, content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="gunluk_dersler.pdf"'
+
+    return response
+
+def generate_pdf_weekly(request):
+    week_offset = int(request.GET.get('week_offset', 0))
+    today = timezone.now().date()
+    start_of_week = today - timedelta(days=today.weekday()) + timedelta(weeks=int(week_offset))
+    end_of_week = start_of_week + timedelta(days=6)
+
+    days_of_week = [start_of_week + timedelta(days=i) for i in range(7)]
+
+    schedules = LessonSchedule.objects.filter(start_date__lte=end_of_week, end_date__gte=start_of_week).order_by('time')
+
+    # Format dates for Azerbaycan language
+    start_of_week_str = f"{start_of_week.day} {get_month_name(start_of_week.month)}"
+    end_of_week_str = f"{end_of_week.day} {get_month_name(end_of_week.month)}"
+
+    # Render the template to a string
+    html_content = render_to_string('weekly/weekly_schedule_pdf.html', {
+        'schedules': schedules,
+        'start_of_week': start_of_week_str,
+        'end_of_week': end_of_week_str,
+        'days_of_week': days_of_week,
+    })
+
+    # Specify the path to wkhtmltopdf
+    path_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+    config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
+
+    # Set PDF options for landscape orientation and fit-to-page settings
+    options = {
+        'orientation': 'Landscape',
+        'page-size': 'A4',
+        'margin-top': '0mm',
+        'margin-right': '0mm',
+        'margin-bottom': '0mm',
+        'margin-left': '0mm',
+        'dpi': 300,
+        'zoom': 1,  # Scale down content to fit everything on one page
+    }
+
+    # Generate the PDF as a binary string
+    pdf_content = pdfkit.from_string(html_content, False, configuration=config, options=options)
+
+    # Create an HttpResponse object with the appropriate headers for file download
+    response = HttpResponse(pdf_content, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="heftelik_dersler_{start_of_week_str}_-_{end_of_week_str}.pdf"'
 
     return response
 
