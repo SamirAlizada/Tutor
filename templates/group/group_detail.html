@@ -113,6 +113,8 @@
             <a class="back-button" href="{% url 'pay_day' %}">Geri</a>
         {% elif next_url == 'day_detail' %}
             <a class="back-button" href="{% url 'day_detail' selected_year selected_month selected_day %}">Geri</a>
+        {% elif next_url == 'week_day_detail' %}
+            <a class="back-button" href="{% url 'week_day_detail' selected_year selected_month selected_day week_offset%}">Geri</a>
         {% else %}
             <a class="back-button" href="{% url 'group_list' %}">Geri</a>
         {% endif %}
@@ -140,10 +142,10 @@
                     <td class="text-center" >{{ student.grade }}</td>
                     <td class="text-center">{{ student.price }} ₼</td>
                     <td class="text-center">
-                        {% if student.student_mobile != '(0)' %}
+                        {% if student.student_mobile != '(0)' and student.student_mobile %}
                             Ş-{{ student.student_mobile }} <br>
                         {% endif %}
-                        {% if student.parent_mobile != '(0)' %}
+                        {% if student.parent_mobile != '(0)' and student.parent_mobile %}
                             V-{{ student.parent_mobile }}
                         {% endif %}
                     </td>                    
