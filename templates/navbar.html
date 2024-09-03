@@ -18,6 +18,10 @@
             color: white !important;
         }
 
+        .nav-linkk {
+            color: black !important;
+        }
+
         .nav-link:hover {
             background-color: #5A6D88;
             color: #FFFFFF !important;
@@ -39,7 +43,16 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
             <ul class="navbar-nav">
-                <a class="nav-link" href="{% url 'daily_list' %}">Günlük</a>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLinkk" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                        Cədvəl
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLinkk">
+                        <a class="nav-link nav-linkk" href="{% url 'daily_list' %}">Günlük</a>
+                        <a class="nav-link nav-linkk" href="{% url 'weekly_schedule' %}">Həftəlik</a>                        
+                    </div>
+                </li>
                 <a class="nav-link" href="{% url 'pay_day' %}">Ödəniş Günü</a>
                 <a class="nav-link" href="{% url 'group_list' %}">Qrup</a>
                 <a class="nav-link" href="{% url 'calendar_view' %}">Təqvim</a>
