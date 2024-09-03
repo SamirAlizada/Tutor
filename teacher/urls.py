@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 from .views import *
 
 urlpatterns = [
@@ -9,7 +9,10 @@ urlpatterns = [
     path('pay-day/', pay_day, name='pay_day'),
     path('calendar/', calendar_view, name='calendar_view'),
     path('day/<int:year>/<int:month>/<int:day>/', day_detail, name='day_detail'),
-
+    re_path(r'^schedule/(?P<week_offset>-?\d+)?/?$', weekly_schedule_view, name='weekly_schedule'),
+    re_path(r'^week-day-detail/(?P<year>[0-9]{4})/(?P<month>[0-9]{1,2})/(?P<day>[0-9]{1,2})/(?P<week_offset>-?\d+)/$', week_day_detail, name='week_day_detail'),
+    re_path(r'^update-weekly-lesson-detail/(?P<schedule_id>\d+)/(?P<year>[0-9]{4})/(?P<month>[0-9]{1,2})/(?P<day>[0-9]{1,2})/(?P<week_offset>-?\d+)/$', update_weekly_lesson_detail, name='update_weekly_lesson_detail'),
+    
     # Add
     path('group/add/', add_group, name='add_group'),
     path('student/add/', add_student, name='add_student'),
@@ -23,6 +26,7 @@ urlpatterns = [
     path('student/update/pay/<int:pk>/', update_student_pay, name='update_student_pay'),
     path('update/<int:schedule_id>/', update_lesson_schedule, name='update_lesson_schedule'),
     path('update/<int:schedule_id>/<int:year>/<int:month>/<int:day>/', update_lesson_detail, name='update_lesson_detail'),
+
     
     # Delete
     path('delete-group/<int:pk>/', delete_group, name='delete_group'),
@@ -37,6 +41,9 @@ urlpatterns = [
 
     path('pdf-daily/', generate_pdf_daily, name='pdf_daily'),
     path('pdf-calendar/', generate_pdf_calendar, name='pdf_calendar'),
+    path('pdf-weekly-schedule/', generate_pdf_weekly, name='pdf_weekly_schedule'),
 
+    
+    
 
 ]
