@@ -110,7 +110,9 @@
     <div class="group-header">
         {% if next_url == 'daily_list' %}
             <a class="back-button" href="{% url 'daily_list' %}">Geri</a>
-        {% else %}
+        {% elif next_url == 'week_day_detail' %}
+            <a class="back-button" href="{% url 'week_day_detail' year month day week_offset%}">Geri</a>
+        {% elif next_url == 'day_detail' %}
             <a class="back-button" href="{% url 'day_detail' selected_year selected_month selected_day %}">Geri</a>
         {% endif %}
         <h2 class="text-center">Dərs Cədvəlini Yenilə</h2>
