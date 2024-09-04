@@ -67,6 +67,10 @@
         text-decoration: none;
         color: white;
     }
+
+    #addd{
+        font-size: large;
+    }
 </style>
 
 {% if messages %}
@@ -112,7 +116,7 @@
         <label for="id_registration_date">Qeydiyyat tarixi:</label>
         {{ form.add_date }}
     </div>
-    <button type="submit">Əlavə Et</button>
+    <button type="submit" id="addd">Əlavə Et</button>
 </form>
 <br><br>
 
