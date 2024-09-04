@@ -145,6 +145,10 @@
     #id_form-4-time{
         height: 38px !important;
     }
+
+    #addd{
+        font-size: large;
+    }
 </style>
 
 <div class="form-container">
@@ -182,12 +186,12 @@
             {% for form in formset %}
             <div class="form-row">
                 <div class="form-group">
-                    <label for="id_product_name">Həftənin Günü:</label>
+                    <label>{{ forloop.counter }}) Həftənin Günü:</label>
                     {{ form.day_of_week }}
                 </div>
                 <div class="form-group">
-                    <label for="id_product_name">Saat:</label>
-                        {{ form.time }}
+                    <label>Saat:</label>
+                    {{ form.time }}
                 </div>
                 <!-- Sil Butonu Gizlidir -->
                 <button type="button" class="btn btn-danger btn-remove" style="display:none;">x</button>
@@ -197,17 +201,17 @@
         <div class="text-right">
             <button type="button" id="add-more" class="btn btn-primary">Əlavə Gün</button>
         </div>
-        <button type="submit">Əlavə Et</button>
+        <button type="submit" id="addd">Əlavə Et</button>
     </form>
 
     <div id="empty_form" style="display: none;">
         <div class="form-row">
             <div class="form-group">
-                <label for="id_product_name">Həftənin Günü:</label>
+                <label class="form-counter"></label>
                 {{ formset.empty_form.day_of_week }}
             </div>
             <div class="form-group">
-                <label for="id_product_name" id="clock2">Saat:</label>
+                <label>Saat:</label>
                 {{ formset.empty_form.time }}
             </div>
             <!-- Yeni açılan formda Sil Butonu -->
@@ -218,6 +222,8 @@
 
 <script>
     $(document).ready(function () {
+        var counter = $('#form_set .form-row').length + 1;
+
         $.datepicker.setDefaults($.datepicker.regional['az']);
         $("input[type='text'][name='start_date'], input[type='text'][name='end_date']").datepicker({
             dateFormat: 'dd/mm/yy',
@@ -226,10 +232,21 @@
             monthNames: ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'İyun', 'İyul', 'Avqust', 'Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr']
         });
 
+        // İlk yükleme sırasında mevcut form satırlarını numaralandırma
+        $('#form_set .form-row').each(function (index) {
+            $(this).find('.form-counter').text((index + 1) + ') Həftənin Günü:');
+        });
+
         $('#add-more').click(function () {
             var form_idx = $('#id_form-TOTAL_FORMS').val();
-            $('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
+            var newForm = $('#empty_form').html().replace(/__prefix__/g, form_idx);
+
+            $('#form_set').append(newForm);
             $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+
+            // Yeni form satırını numaralandır
+            $('#form_set .form-row:last-child').find('.form-counter').text(counter + ') Həftənin Günü:');
+            counter++;
 
             $("input[type='text'][name='start_date'], input[type='text'][name='end_date']").datepicker({
                 dateFormat: 'dd/mm/yy',
@@ -238,14 +255,24 @@
                 monthNames: ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'İyun', 'İyul', 'Avqust', 'Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr']
             });
 
-            $('#form_set .form-row:last-child .btn-remove').show();
+            // Yeni form satırına Sil butonu ekleme ve işlevselliği
+            $('.btn-remove').off('click').on('click', function () {
+                $(this).closest('.form-row').remove();
+                counter--;  // Sayıyı azalt
+                $('#form_set .form-row').each(function (index) {
+                    $(this).find('.form-counter').text((index + 1) + ') Həftənin Günü:');
+                });
+            });
         });
 
-        $('#form_set').on('click', '.btn-remove', function () {
+        // Mevcut form satırlarına Sil butonu ekleme ve işlevselliği
+        $('.btn-remove').on('click', function () {
             $(this).closest('.form-row').remove();
-            var totalForms = $('#id_form-TOTAL_FORMS');
-            totalForms.val(parseInt(totalForms.val()) - 1);
+            counter--;  // Sayıyı azalt
+            $('#form_set .form-row').each(function (index) {
+                $(this).find('.form-counter').text((index + 1) + ') Həftənin Günü:');
+            });
         });
     });
 </script>
-{% endblock content %}
+{% endblock %}
